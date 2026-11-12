@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:VirgoHub.Mobile.Controls"
+             xmlns:local="clr-namespace:VirgoHub.Mobile"
+             x:Class="VirgoHub.Mobile.ElectionDetailPage"
+             x:Name="ElectionPage"
+             Title="Election"
+             NavigationPage.HasNavigationBar="False"
+             BackgroundColor="{AppThemeBinding Light=#F3F7FF, Dark=#07172C}">
+    <Grid RowDefinitions="*,Auto">
+        <ScrollView Grid.Row="0">
+            <VerticalStackLayout Padding="18,16,18,20" Spacing="18">
+                <Border Padding="18"
+                        BackgroundColor="{AppThemeBinding Light=White, Dark=#102542}"
+                        Stroke="{AppThemeBinding Light=#D8E5FB, Dark=#1A3B70}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="26" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="{Binding Store.SelectedElectionTitle}"
+                               FontSize="24"
+                               FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                        <Label Text="{Binding Store.SelectedElectionMeta}"
+                               FontSize="13"
+                               TextColor="{AppThemeBinding Light=#5B78A2, Dark=#C8D9F0}" />
+                        <Grid ColumnDefinitions="*,*"
+                              ColumnSpacing="10">
+                            <Border Grid.Column="0"
+                                    Padding="12"
+                                    BackgroundColor="{AppThemeBinding Light=#E9FFF1, Dark=#153C2F}"
+                                    StrokeThickness="0">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="18" />
+                                </Border.StrokeShape>
+                                <Label Text="{Binding ElectionStatus}"
+                                       HorizontalTextAlignment="Center"
+                                       FontAttributes="Bold"
+                                       TextColor="#3BA86B" />
+                            </Border>
+                            <Border Grid.Column="1"
+                                    Padding="12"
+                                    BackgroundColor="{AppThemeBinding Light=#EAF4FF, Dark=#17355F}"
+                                    StrokeThickness="0">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="18" />
+                                </Border.StrokeShape>
+                                <Label Text="{Binding ElectionWindow}"
+                                       HorizontalTextAlignment="Center"
+                                       FontAttributes="Bold"
+                                       TextColor="#0F4BA8" />
+                            </Border>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <VerticalStackLayout BindableLayout.ItemsSource="{Binding VisibleCandidates}" Spacing="12">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate>
+                            <Border Padding="16"
+                                    BackgroundColor="{AppThemeBinding Light=White, Dark=#102542}"
+                                    Stroke="{AppThemeBinding Light=#D8E5FB, Dark=#1A3B70}">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="22" />
+                                </Border.StrokeShape>
+                                <VerticalStackLayout Spacing="10">
+                                    <Grid ColumnDefinitions="*,Auto"
+                                          ColumnSpacing="10">
+                                        <VerticalStackLayout Grid.Column="0"
+                                                             Spacing="3">
+                                            <Label Text="{Binding Name}"
+                                                   FontSize="17"
+                                                   FontAttributes="Bold"
+                                                   TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                                            <Label Text="{Binding Department}"
+                                                   TextColor="{AppThemeBinding Light=#5B78A2, Dark=#C8D9F0}" />
+                                        </VerticalStackLayout>
+                                        <Border Grid.Column="1"
+                                                Padding="10,6"
+                                                VerticalOptions="Center"
+                                                BackgroundColor="{AppThemeBinding Light=#EDF4FF, Dark=#0B2249}"
+                                                StrokeThickness="0">
+                                            <Border.StrokeShape>
+                                                <RoundRectangle CornerRadius="14" />
+                                            </Border.StrokeShape>
+                                            <Label Text="{Binding VoteCount, StringFormat='{}{0} vote(s)'}"
+                                                   FontAttributes="Bold"
+                                                   TextColor="#0F4BA8" />
+                                        </Border>
+                                    </Grid>
+                                    <Label Text="{Binding Manifesto}"
+                                           TextColor="{AppThemeBinding Light=#5B78A2, Dark=#C8D9F0}"
+                                           LineBreakMode="WordWrap" />
+                                    <Button Text="{Binding Source={x:Reference ElectionPage}, Path=VoteButtonText}"
+                                            BackgroundColor="#0F4BA8"
+                                            Clicked="OnVoteClicked" />
+                                </VerticalStackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <controls:PortalBottomNav Grid.Row="1"
+                                  ActiveTab="Voting" />
+    </Grid>
+</ContentPage>

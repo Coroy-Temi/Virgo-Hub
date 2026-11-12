@@ -1,0 +1,520 @@
+@page "/library"
+@attribute [Authorize(Roles = "SuperAdmin,Admin,Lecturer")]
+@inject VirgoHubService Hub
+
+<PageTitle>VirgoHub Course Materials</PageTitle>
+
+@if (!hasAccess)
+{
+    <section class="surface-card">
+        <div class="empty-state-vgh">
+            <strong>Access restricted</strong>
+            <span>Your portal account does not have permission to manage course materials.</span>
+        </div>
+    </section>
+}
+else
+{
+<section class="page-intro">
+    <div>
+        <div class="section-kicker">Materials Desk</div>
+        <h2>Manage course access, lecturer uploads, and enrollment approvals.</h2>
+        <p>Publish each course under the right academic scope, decide whether approval is automatic or manual, and review pending student requests before materials open.</p>
+    </div>
+</section>
+
+@if (!string.IsNullOrWhiteSpace(feedback))
+{
+    <div class="toast-banner @feedbackType">@feedback</div>
+}
+
+<section class="dashboard-grid">
+    <div class="surface-card">
+        <div class="surface-head">
+            <h3>Publish course material</h3>
+        </div>
+        <div class="form-grid-vgh">
+            @if (CanAssignLecturer)
+            {
+                <label class="full-span">
+                    <span>Lecturer account</span>
+                    <InputSelect @bind-Value="CreateLecturerUserId">
+                        <option value="">Choose lecturer</option>
+                        @foreach (var item in lecturers)
+                        {
+                            <option value="@item.Id">@item.FullName - @item.Department</option>
+                        }
+                    </InputSelect>
+                </label>
+            }
+            <label><span>Course code</span><InputText @bind-Value="materialRequest.CourseCode" /></label>
+            <label><span>Course title</span><InputText @bind-Value="materialRequest.Title" /></label>
+            <label><span>Lecturer name</span><InputText @bind-Value="materialRequest.LecturerName" disabled /></label>
+            <label><span>Material type</span><InputText @bind-Value="materialRequest.MaterialType" /></label>
+            <label><span>Resource link</span><InputText @bind-Value="materialRequest.ResourceUrl" /></label>
+            <label><span>Uploaded by</span><InputText @bind-Value="materialRequest.UploadedBy" /></label>
+            <label><span>General course</span><InputCheckbox @bind-Value="materialRequest.IsGeneralCourse" /></label>
+            <label><span>Manual approval</span><InputCheckbox @bind-Value="materialRequest.RequiresManualApproval" /></label>
+            @if (!materialRequest.IsGeneralCourse)
+            {
+                <label><span>Faculty</span><InputText @bind-Value="materialRequest.Faculty" /></label>
+                <label><span>Department</span><InputText @bind-Value="materialRequest.Department" /></label>
+                <label><span>Level</span><InputText @bind-Value="materialRequest.Level" /></label>
+            }
+            <label class="full-span"><span>Summary</span><InputTextArea @bind-Value="materialRequest.Summary" /></label>
+        </div>
+        <button class="vgh-button" @onclick="CreateMaterialAsync">Publish material</button>
+    </div>
+
+    <div class="surface-card">
+        <div class="surface-head">
+            <h3>Edit course material</h3>
+        </div>
+        <div class="form-grid-vgh">
+            <label class="full-span">
+                <span>Select material</span>
+                <InputSelect @bind-Value="selectedMaterialId">
+                    <option value="">Choose a material</option>
+                    @foreach (var item in materials)
+                    {
+                        <option value="@item.Id">@item.CourseCode - @item.Title</option>
+                    }
+                </InputSelect>
+            </label>
+        </div>
+        <div style="margin-top: 0.9rem; display: flex; gap: 0.75rem; flex-wrap: wrap;">
+            <button class="vgh-button alt" @onclick="LoadMaterialEditor">Load material</button>
+            @if (selectedMaterial is not null)
+            {
+                <button class="vgh-button" @onclick="UpdateMaterialAsync">Save changes</button>
+                <button class="vgh-button alt" @onclick="DeleteMaterialAsync">Delete material</button>
+            }
+        </div>
+
+        @if (selectedMaterial is not null)
+        {
+            <div class="form-grid-vgh" style="margin-top: 1rem;">
+                @if (CanAssignLecturer)
+                {
+                    <label class="full-span">
+                        <span>Lecturer account</span>
+                        <InputSelect @bind-Value="EditLecturerUserId">
+                            <option value="">Choose lecturer</option>
+                            @foreach (var item in lecturers)
+                            {
+                                <option value="@item.Id">@item.FullName - @item.Department</option>
+                            }
+                        </InputSelect>
+                    </label>
+                }
+                <label><span>Course code</span><InputText @bind-Value="materialEditor.CourseCode" /></label>
+                <label><span>Course title</span><InputText @bind-Value="materialEditor.Title" /></label>
+                <label><span>Lecturer name</span><InputText @bind-Value="materialEditor.LecturerName" disabled /></label>
+                <label><span>Material type</span><InputText @bind-Value="materialEditor.MaterialType" /></label>
+                <label><span>Resource link</span><InputText @bind-Value="materialEditor.ResourceUrl" /></label>
+                <label><span>Uploaded by</span><InputText @bind-Value="materialEditor.UploadedBy" /></label>
+                <label><span>General course</span><InputCheckbox @bind-Value="materialEditor.IsGeneralCourse" /></label>
+                <label><span>Manual approval</span><InputCheckbox @bind-Value="materialEditor.RequiresManualApproval" /></label>
+                @if (!materialEditor.IsGeneralCourse)
+                {
+                    <label><span>Faculty</span><InputText @bind-Value="materialEditor.Faculty" /></label>
+                    <label><span>Department</span><InputText @bind-Value="materialEditor.Department" /></label>
+                    <label><span>Level</span><InputText @bind-Value="materialEditor.Level" /></label>
+                }
+                <label class="full-span"><span>Summary</span><InputTextArea @bind-Value="materialEditor.Summary" /></label>
+            </div>
+        }
+    </div>
+</section>
+
+<section class="dashboard-grid">
+    <div class="surface-card">
+        <div class="surface-head">
+            <h3>Published materials</h3>
+            <span>@materials.Count items</span>
+        </div>
+        <div class="table-shell">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Course</th>
+                        <th>Scope</th>
+                        <th>Lecturer</th>
+                        <th>Approval</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in materials)
+                    {
+                        <tr>
+                            <td>@item.CourseCode - @item.Title</td>
+                            <td>@GetMaterialScope(item)</td>
+                            <td>@item.LecturerName</td>
+                            <td>@(item.RequiresManualApproval ? "Manual" : "Automatic")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="surface-card">
+        <div class="surface-head">
+            <h3>Bulk approval</h3>
+        </div>
+        <div class="form-grid-vgh">
+            <label>
+                <span>Course code</span>
+                <InputSelect @bind-Value="approvalRequest.CourseCode">
+                    <option value="">Choose a course</option>
+                    @foreach (var courseCode in PendingCourseCodes)
+                    {
+                        <option value="@courseCode">@courseCode</option>
+                    }
+                </InputSelect>
+            </label>
+            <label><span>Faculty filter</span><InputText @bind-Value="approvalRequest.Faculty" /></label>
+            <label><span>Department filter</span><InputText @bind-Value="approvalRequest.Department" /></label>
+            <label><span>Level filter</span><InputText @bind-Value="approvalRequest.Level" /></label>
+        </div>
+        <button class="vgh-button" @onclick="ApproveMatchingEnrollmentsAsync">Approve matching requests</button>
+    </div>
+</section>
+
+<section class="surface-card">
+    <div class="surface-head">
+        <h3>Course enrollments</h3>
+        <span>@enrollments.Count records</span>
+    </div>
+    <div class="table-shell">
+        <table>
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Course</th>
+                    <th>Academic profile</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in enrollments)
+                {
+                    <tr>
+                        <td>@item.StudentName</td>
+                        <td>@item.CourseCode - @item.CourseTitle</td>
+                        <td>@GetEnrollmentScope(item)</td>
+                        <td>@item.Status</td>
+                        <td>
+                            @if (item.Status == CourseEnrollmentStatus.Pending)
+                            {
+                                <button class="vgh-button alt" @onclick="() => ApproveEnrollmentAsync(item.Id)">Approve</button>
+                            }
+                            else
+                            {
+                                <span>Approved</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</section>
+}
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthenticationStateTask { get; set; }
+
+    private CreateCourseMaterialRequest materialRequest = new() { MaterialType = "Lecture Note" };
+    private UpdateCourseMaterialRequest materialEditor = new() { MaterialType = "Lecture Note" };
+    private CourseEnrollmentApprovalRequest approvalRequest = new();
+    private List<CourseMaterial> materials = [];
+    private List<CourseEnrollment> enrollments = [];
+    private List<UserProfile> lecturers = [];
+    private UserProfile? currentUser;
+    private CourseMaterial? selectedMaterial;
+    private string selectedMaterialId = string.Empty;
+    private string feedback = string.Empty;
+    private string feedbackType = "ok";
+    private bool hasAccess;
+
+    private bool CanAssignLecturer => currentUser?.Role is UserRole.SuperAdmin or UserRole.Admin;
+
+    private string CreateLecturerUserId
+    {
+        get => materialRequest.LecturerUserId;
+        set
+        {
+            materialRequest.LecturerUserId = value;
+            SyncCreateLecturer();
+        }
+    }
+
+    private string EditLecturerUserId
+    {
+        get => materialEditor.LecturerUserId;
+        set
+        {
+            materialEditor.LecturerUserId = value;
+            SyncEditLecturer();
+        }
+    }
+
+    private IReadOnlyList<string> PendingCourseCodes =>
+        enrollments
+            .Where(x => x.Status == CourseEnrollmentStatus.Pending)
+            .Select(x => x.CourseCode)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .OrderBy(x => x)
+            .ToList();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (AuthenticationStateTask is null)
+        {
+            return;
+        }
+
+        var authState = await AuthenticationStateTask;
+        var userId = authState.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        currentUser = string.IsNullOrWhiteSpace(userId) ? null : Hub.GetUserById(userId);
+        hasAccess = currentUser is not null &&
+                    (currentUser.Role == UserRole.SuperAdmin ||
+                     currentUser.Role == UserRole.Lecturer ||
+                     Hub.CanAccessModule(currentUser.Id, AdminModule.Library));
+
+        if (hasAccess)
+        {
+            Reload();
+            ApplyMaterialOwnerDefaults();
+        }
+    }
+
+    private async Task CreateMaterialAsync()
+    {
+        try
+        {
+            EnsureMaterialOwnerSelection(materialRequest.LecturerUserId);
+            await Hub.CreateCourseMaterialAsync(currentUser!.Id, materialRequest);
+            feedback = "The course material has been published.";
+            feedbackType = "ok";
+            materialRequest = new CreateCourseMaterialRequest { MaterialType = "Lecture Note" };
+            ApplyMaterialOwnerDefaults();
+            Reload();
+        }
+        catch (Exception ex)
+        {
+            feedback = ex.Message;
+            feedbackType = "error";
+        }
+    }
+
+    private void LoadMaterialEditor()
+    {
+        selectedMaterial = materials.FirstOrDefault(x => x.Id == selectedMaterialId);
+        if (selectedMaterial is null)
+        {
+            feedback = "Select a course material first.";
+            feedbackType = "error";
+            return;
+        }
+
+        materialEditor = new UpdateCourseMaterialRequest
+        {
+            CourseCode = selectedMaterial.CourseCode,
+            Title = selectedMaterial.Title,
+            LecturerName = selectedMaterial.LecturerName,
+            LecturerUserId = selectedMaterial.LecturerUserId,
+            Faculty = selectedMaterial.Faculty,
+            Department = selectedMaterial.Department,
+            Level = selectedMaterial.Level,
+            IsGeneralCourse = selectedMaterial.IsGeneralCourse,
+            RequiresManualApproval = selectedMaterial.RequiresManualApproval,
+            MaterialType = selectedMaterial.MaterialType,
+            ResourceUrl = selectedMaterial.ResourceUrl,
+            Summary = selectedMaterial.Summary,
+            UploadedBy = selectedMaterial.UploadedBy
+        };
+    }
+
+    private async Task UpdateMaterialAsync()
+    {
+        try
+        {
+            if (selectedMaterial is null)
+            {
+                throw new InvalidOperationException("Load a course material first.");
+            }
+
+            EnsureMaterialOwnerSelection(materialEditor.LecturerUserId);
+            await Hub.UpdateCourseMaterialAsync(currentUser!.Id, selectedMaterial.Id, materialEditor);
+            feedback = "The course material has been updated.";
+            feedbackType = "ok";
+            Reload();
+            LoadMaterialEditor();
+        }
+        catch (Exception ex)
+        {
+            feedback = ex.Message;
+            feedbackType = "error";
+        }
+    }
+
+    private async Task DeleteMaterialAsync()
+    {
+        try
+        {
+            if (selectedMaterial is null)
+            {
+                throw new InvalidOperationException("Load a course material first.");
+            }
+
+            await Hub.DeleteCourseMaterialAsync(currentUser!.Id, selectedMaterial.Id);
+            feedback = "The course material has been deleted.";
+            feedbackType = "ok";
+            selectedMaterial = null;
+            selectedMaterialId = string.Empty;
+            materialEditor = new UpdateCourseMaterialRequest { MaterialType = "Lecture Note" };
+            Reload();
+        }
+        catch (Exception ex)
+        {
+            feedback = ex.Message;
+            feedbackType = "error";
+        }
+    }
+
+    private async Task ApproveEnrollmentAsync(string enrollmentId)
+    {
+        try
+        {
+            await Hub.ApproveCourseEnrollmentAsync(currentUser!.Id, enrollmentId);
+            feedback = "The enrollment request has been approved.";
+            feedbackType = "ok";
+            Reload();
+        }
+        catch (Exception ex)
+        {
+            feedback = ex.Message;
+            feedbackType = "error";
+        }
+    }
+
+    private async Task ApproveMatchingEnrollmentsAsync()
+    {
+        try
+        {
+            var count = await Hub.ApproveCourseEnrollmentsAsync(currentUser!.Id, approvalRequest);
+            feedback = count == 0
+                ? "No pending requests matched the current approval filters."
+                : $"{count} enrollment request(s) approved.";
+            feedbackType = "ok";
+            approvalRequest = new CourseEnrollmentApprovalRequest();
+            Reload();
+        }
+        catch (Exception ex)
+        {
+            feedback = ex.Message;
+            feedbackType = "error";
+        }
+    }
+
+    private void SyncCreateLecturer()
+    {
+        var lecturer = ResolveSelectedLecturer(materialRequest.LecturerUserId);
+        if (lecturer is null)
+        {
+            return;
+        }
+
+        materialRequest.LecturerName = lecturer.FullName;
+        if (!materialRequest.IsGeneralCourse)
+        {
+            materialRequest.Faculty = lecturer.Faculty;
+            materialRequest.Department = lecturer.Department;
+        }
+        materialRequest.UploadedBy = lecturer.FullName;
+    }
+
+    private void SyncEditLecturer()
+    {
+        var lecturer = ResolveSelectedLecturer(materialEditor.LecturerUserId);
+        if (lecturer is null)
+        {
+            return;
+        }
+
+        materialEditor.LecturerName = lecturer.FullName;
+        if (!materialEditor.IsGeneralCourse)
+        {
+            materialEditor.Faculty = lecturer.Faculty;
+            materialEditor.Department = lecturer.Department;
+        }
+        materialEditor.UploadedBy = lecturer.FullName;
+    }
+
+    private UserProfile? ResolveSelectedLecturer(string lecturerUserId) =>
+        lecturers.FirstOrDefault(x => x.Id == lecturerUserId);
+
+    private void EnsureMaterialOwnerSelection(string lecturerUserId)
+    {
+        if (currentUser?.Role == UserRole.Lecturer)
+        {
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(lecturerUserId))
+        {
+            throw new InvalidOperationException("Choose the lecturer who owns this course.");
+        }
+    }
+
+    private void ApplyMaterialOwnerDefaults()
+    {
+        if (currentUser is null)
+        {
+            return;
+        }
+
+        if (currentUser.Role == UserRole.Lecturer)
+        {
+            materialRequest.LecturerUserId = currentUser.Id;
+            materialRequest.LecturerName = currentUser.FullName;
+            materialRequest.Faculty = currentUser.Faculty;
+            materialRequest.Department = currentUser.Department;
+            materialRequest.UploadedBy = currentUser.FullName;
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(materialRequest.LecturerUserId) && lecturers.Count > 0)
+        {
+            materialRequest.LecturerUserId = lecturers[0].Id;
+            SyncCreateLecturer();
+        }
+    }
+
+    private void Reload()
+    {
+        if (currentUser is null)
+        {
+            materials = [];
+            enrollments = [];
+            lecturers = [];
+            return;
+        }
+
+        lecturers = Hub.GetLecturers(currentUser.Id).ToList();
+        materials = Hub.GetCourseMaterialsForPortalUser(currentUser.Id).ToList();
+        enrollments = Hub.GetEnrollmentsForPortalUser(currentUser.Id).ToList();
+    }
+
+    private static string GetMaterialScope(CourseMaterial material) =>
+        material.IsGeneralCourse
+            ? "General course | All students"
+            : $"{material.Faculty} | {material.Department} | {material.Level} Level";
+
+    private static string GetEnrollmentScope(CourseEnrollment enrollment) =>
+        $"{enrollment.Faculty} | {enrollment.Department} | {enrollment.Level} Level";
+}

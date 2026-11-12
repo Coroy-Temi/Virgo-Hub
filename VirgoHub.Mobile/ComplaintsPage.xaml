@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:VirgoHub.Mobile.Controls"
+             x:Class="VirgoHub.Mobile.ComplaintsPage"
+             Title="Complaints"
+             NavigationPage.HasNavigationBar="False"
+             BackgroundColor="{AppThemeBinding Light=#F3F7FF, Dark=#07172C}">
+    <Grid RowDefinitions="*,Auto">
+        <ScrollView Grid.Row="0">
+            <VerticalStackLayout Padding="18,16,18,20" Spacing="18">
+                <Border Padding="18"
+                        BackgroundColor="{AppThemeBinding Light=White, Dark=#102542}"
+                        Stroke="{AppThemeBinding Light=#D8E5FB, Dark=#1A3B70}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="26" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout Spacing="12">
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                            <Image Grid.Column="0" Source="icon_complaints.svg" HeightRequest="50" WidthRequest="50" />
+                            <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                <Label Text="Hostel Support"
+                                       FontSize="24"
+                                       FontAttributes="Bold"
+                                       TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                                <Label Text="Send a complaint neatly and keep track of every hostel response."
+                                       FontSize="13"
+                                       TextColor="{AppThemeBinding Light=#5B78A2, Dark=#C8D9F0}" />
+                            </VerticalStackLayout>
+                        </Grid>
+
+                        <Entry Text="{Binding ComplaintTitle}"
+                               Placeholder="Complaint title" />
+                        <Picker Title="Choose category"
+                                ItemsSource="{Binding Store.ComplaintCategories}"
+                                SelectedItem="{Binding SelectedCategory}" />
+                        <Entry Text="{Binding HostelName}"
+                               Placeholder="Hostel name" />
+                        <Entry Text="{Binding RoomNumber}"
+                               Placeholder="Room number" />
+                        <Editor Text="{Binding ComplaintDescription}"
+                                Placeholder="Describe the issue clearly"
+                                AutoSize="TextChanges"
+                                HeightRequest="120" />
+                        <Button Text="Send complaint"
+                                BackgroundColor="#0F4BA8"
+                                Clicked="OnSendComplaintClicked" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Padding="18"
+                        BackgroundColor="{AppThemeBinding Light=White, Dark=#102542}"
+                        Stroke="{AppThemeBinding Light=#D8E5FB, Dark=#1A3B70}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="26" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="My Complaint History"
+                               FontSize="22"
+                               FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding Store.MyComplaints}"
+                                             Spacing="10">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Padding="14"
+                                            BackgroundColor="{AppThemeBinding Light=#F2F7FF, Dark=#0B2249}"
+                                            StrokeThickness="0">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="18" />
+                                        </Border.StrokeShape>
+                                        <VerticalStackLayout Spacing="4">
+                                            <Label Text="{Binding Title}" FontAttributes="Bold" TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                                            <Label Text="{Binding Category}" TextColor="#0F4BA8" />
+                                            <Label Text="{Binding Description}" TextColor="{AppThemeBinding Light=#5B78A2, Dark=#C8D9F0}" LineBreakMode="WordWrap" />
+                                            <Label Text="{Binding Status}" TextColor="{AppThemeBinding Light=#5B78A2, Dark=#C8D9F0}" />
+                                            <Label Text="{Binding ResolutionNote}" TextColor="{AppThemeBinding Light=#5B78A2, Dark=#C8D9F0}" LineBreakMode="WordWrap" />
+                                            <Label Text="{Binding UpdatedAt, StringFormat='{}Updated: {0:dd MMM yyyy, hh:mm tt}'}" TextColor="{AppThemeBinding Light=#5B78A2, Dark=#C8D9F0}" />
+                                        </VerticalStackLayout>
+                                    </Border>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <controls:PortalBottomNav Grid.Row="1"
+                                  ActiveTab="Home" />
+    </Grid>
+</ContentPage>

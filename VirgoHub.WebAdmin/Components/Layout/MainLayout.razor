@@ -1,0 +1,135 @@
+@inherits LayoutComponentBase
+@inject VirgoHubService Hub
+
+<div class="admin-shell">
+    <aside class="admin-sidebar">
+        <div class="brand-card">
+            <img class="brand-logo" src="/images/virgohub-vh-logo.svg" alt="VirgoHub VH logo" />
+            <div class="brand-badge">VirgoHub</div>
+            <h1>@PortalTitle</h1>
+            <p>@PortalSummary</p>
+        </div>
+
+        <NavMenu />
+
+        <div class="sidebar-footnote">
+            <span>@CurrentRoleLabel</span>
+            <strong>@(PortalUser?.FullName ?? "Portal account")</strong>
+        </div>
+    </aside>
+
+    <main class="admin-main">
+        <header class="admin-topbar">
+            <div class="topbar-main">
+                <div class="topbar-kicker">@CurrentRoleLabel</div>
+                <div class="topbar-title">@PortalHeadline</div>
+                <div class="topbar-subtitle">@PortalSummary</div>
+            </div>
+
+            <div class="topbar-user">
+                <div class="topbar-status-rail">
+                    <div class="status-pill">
+                        <span class="status-pill-label">Access</span>
+                        <strong>@(PortalUser?.Role == UserRole.Porter ? "Scoped" : "Full")</strong>
+                    </div>
+                    <div class="status-pill">
+                        <span class="status-pill-label">Focus</span>
+                        <strong>@WorkspaceFocus</strong>
+                    </div>
+                </div>
+                <div class="topbar-avatar">@AvatarText</div>
+                <div>
+                    <strong>@(PortalUser?.FullName ?? "VirgoHub Portal")</strong>
+                    <div>@PortalMeta</div>
+                </div>
+                <a class="logout-link" href="/auth/logout">Sign out</a>
+            </div>
+        </header>
+
+        <section class="admin-body">
+            @Body
+        </section>
+    </main>
+</div>
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthenticationStateTask { get; set; }
+
+    private UserProfile? PortalUser { get; set; }
+
+    private string CurrentRoleLabel => PortalUser?.Role switch
+    {
+        UserRole.PlatformSuperAdmin => "Platform Control",
+        UserRole.Porter => "Porter Complaint Desk",
+        UserRole.Lecturer => "Lecturer Materials Desk",
+        UserRole.Admin => "Operations Admin",
+        _ => "Super Admin Console"
+    };
+
+    private string PortalTitle => PortalUser?.Role switch
+    {
+        UserRole.PlatformSuperAdmin => "Platform Console",
+        UserRole.Porter => "Complaints Portal",
+        UserRole.Lecturer => "Lecturer Portal",
+        UserRole.Admin => "Operations Portal",
+        _ => "Super Admin Portal"
+    };
+
+    private string PortalSummary => PortalUser?.Role switch
+    {
+        UserRole.PlatformSuperAdmin => "Create school workspaces, assign school super admins, and protect tenant boundaries across the platform.",
+        UserRole.Porter => "Review and respond to complaint records assigned to your hostel scope.",
+        UserRole.Lecturer => "Upload course materials, review enrollments, and control manual approvals for your classes.",
+        UserRole.Admin => "Manage the service areas assigned to your portal account.",
+        _ => "Manage students, events, voting, complaints, library records, and campus services from one portal."
+    };
+
+    private string PortalHeadline => PortalUser?.Role switch
+    {
+        UserRole.PlatformSuperAdmin => "School workspaces",
+        UserRole.Porter => "Complaint response",
+        UserRole.Lecturer => "Course materials",
+        UserRole.Admin => "Assigned operations",
+        _ => "School operations"
+    };
+
+    private string PortalMeta => PortalUser?.Role switch
+    {
+        UserRole.PlatformSuperAdmin => "Platform-wide access",
+        UserRole.Porter => $"Staff ID: {PortalUser?.StaffId} | Scope: {PortalUser?.Gender} hostels",
+        UserRole.Lecturer => $"Staff ID: {PortalUser?.StaffId} | {PortalUser?.Faculty} | {PortalUser?.Department}",
+        UserRole.Admin => string.Join(" | ", Hub.GetAccessibleModules(PortalUser).Select(x => x.ToString())),
+        _ => "Full system access"
+    };
+
+    private string WorkspaceFocus => PortalUser?.Role switch
+    {
+        UserRole.PlatformSuperAdmin => "Schools",
+        UserRole.Porter => "Complaints",
+        UserRole.Lecturer => "Materials",
+        UserRole.Admin => Hub.GetAccessibleModules(PortalUser).Count > 0
+            ? string.Join(", ", Hub.GetAccessibleModules(PortalUser).Take(2))
+            : "Assigned",
+        _ => "Operations"
+    };
+
+    private string AvatarText =>
+        string.Concat((PortalUser?.FullName ?? "VirgoHub Portal")
+            .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+            .Take(2)
+            .Select(part => char.ToUpperInvariant(part[0])));
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (AuthenticationStateTask is null)
+        {
+            PortalUser = null;
+            return;
+        }
+
+        var authState = await AuthenticationStateTask;
+        var userId = authState.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        PortalUser = string.IsNullOrWhiteSpace(userId) ? null : Hub.GetUserById(userId);
+    }
+}

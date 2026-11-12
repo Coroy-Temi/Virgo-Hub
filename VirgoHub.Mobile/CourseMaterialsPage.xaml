@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:VirgoHub.Mobile.Controls"
+             x:Class="VirgoHub.Mobile.CourseMaterialsPage"
+             Title="Course Materials"
+             NavigationPage.HasNavigationBar="False"
+             BackgroundColor="{AppThemeBinding Light=#F3F7FF, Dark=#07172C}">
+    <Grid RowDefinitions="*,Auto">
+        <ScrollView Grid.Row="0">
+            <VerticalStackLayout Padding="18,16,18,20" Spacing="18">
+                <Border Padding="18"
+                        BackgroundColor="{AppThemeBinding Light=White, Dark=#102542}"
+                        Stroke="{AppThemeBinding Light=#D8E5FB, Dark=#1A3B70}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="26" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="{Binding Store.SelectedCourseTitle}"
+                               FontSize="24"
+                               FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                        <Label Text="{Binding Store.SelectedCourseMeta}"
+                               FontSize="13"
+                               TextColor="{AppThemeBinding Light=#5B78A2, Dark=#C8D9F0}" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Padding="18"
+                        IsVisible="{Binding IsPendingApproval}"
+                        BackgroundColor="{AppThemeBinding Light=White, Dark=#102542}"
+                        Stroke="{AppThemeBinding Light=#D8E5FB, Dark=#1A3B70}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="18" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Awaiting lecturer approval"
+                               FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                        <Label Text="Your enrollment request has been received. Course materials will appear here once the lecturer approves your access."
+                               TextColor="{AppThemeBinding Light=#5B78A2, Dark=#C8D9F0}"
+                               LineBreakMode="WordWrap" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <VerticalStackLayout IsVisible="{Binding IsShowingMaterials}"
+                                     BindableLayout.ItemsSource="{Binding VisibleMaterials}"
+                                     Spacing="12">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate>
+                            <Border Padding="14"
+                                    BackgroundColor="{AppThemeBinding Light=White, Dark=#102542}"
+                                    Stroke="{AppThemeBinding Light=#D8E5FB, Dark=#1A3B70}">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="18" />
+                                </Border.StrokeShape>
+                                <VerticalStackLayout Spacing="6">
+                                    <Label Text="{Binding Title}" FontAttributes="Bold" TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                                    <Label Text="{Binding LecturerName}" TextColor="{AppThemeBinding Light=#5B78A2, Dark=#C8D9F0}" />
+                                    <Label Text="{Binding Summary}" TextColor="{AppThemeBinding Light=#5B78A2, Dark=#C8D9F0}" LineBreakMode="WordWrap" />
+                                    <Label Text="{Binding MaterialType}" TextColor="#0F4BA8" />
+                                    <Button Text="Open material"
+                                            BackgroundColor="#DCEBFF"
+                                            TextColor="#0B2A56"
+                                            Clicked="OnOpenMaterialClicked" />
+                                </VerticalStackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+
+                <Border Padding="18"
+                        IsVisible="{Binding HasVisibleAssessments}"
+                        BackgroundColor="{AppThemeBinding Light=White, Dark=#102542}"
+                        Stroke="{AppThemeBinding Light=#D8E5FB, Dark=#1A3B70}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="22" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Related Assessments"
+                               FontSize="20"
+                               FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding VisibleAssessments}"
+                                             Spacing="10">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Padding="14"
+                                            BackgroundColor="{AppThemeBinding Light=#F5FAFF, Dark=#0B2249}"
+                                            StrokeThickness="0">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="18" />
+                                        </Border.StrokeShape>
+                                        <Grid ColumnDefinitions="*,Auto"
+                                              ColumnSpacing="10">
+                                            <VerticalStackLayout Grid.Column="0"
+                                                                 Spacing="4">
+                                                <Label Text="{Binding Title}"
+                                                       FontAttributes="Bold"
+                                                       TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                                                <Label Text="{Binding Type}"
+                                                       TextColor="#25A9F5" />
+                                                <Label Text="{Binding DueAt, StringFormat='{}Due: {0:dd MMM yyyy, hh:mm tt}'}"
+                                                       FontSize="13"
+                                                       TextColor="{AppThemeBinding Light=#5B78A2, Dark=#C8D9F0}" />
+                                            </VerticalStackLayout>
+                                            <Button Grid.Column="1"
+                                                    Text="Open"
+                                                    BackgroundColor="#25A9F5"
+                                                    TextColor="White"
+                                                    Clicked="OnOpenAssessmentClicked" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <controls:PortalBottomNav Grid.Row="1"
+                                  ActiveTab="Materials" />
+    </Grid>
+</ContentPage>

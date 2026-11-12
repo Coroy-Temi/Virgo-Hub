@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:VirgoHub.Mobile.Controls"
+             x:Class="VirgoHub.Mobile.ElectionGroupPage"
+             NavigationPage.HasNavigationBar="False"
+             BackgroundColor="{AppThemeBinding Light=#EFF7FF, Dark=#07172C}">
+    <Grid RowDefinitions="*,Auto">
+        <ScrollView Grid.Row="0">
+            <VerticalStackLayout Padding="20,18,20,22" Spacing="18">
+                <Grid ColumnDefinitions="Auto,*"
+                      ColumnSpacing="14">
+                    <Label Text="←"
+                           FontSize="28"
+                           VerticalTextAlignment="Center"
+                           TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnBackTapped" />
+                        </Label.GestureRecognizers>
+                    </Label>
+                    <VerticalStackLayout Grid.Column="1" Spacing="4">
+                        <Label Text="{Binding ElectionTitle}"
+                               FontSize="28"
+                               FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                        <Label Text="Open a position to vote for candidates, or view the live results board for the whole election."
+                               FontSize="13"
+                               TextColor="{AppThemeBinding Light=#6884A5, Dark=#C8D9F0}" />
+                    </VerticalStackLayout>
+                </Grid>
+
+                <Button Text="View Live Results"
+                        BackgroundColor="#25A9F5"
+                        TextColor="White"
+                        FontAttributes="Bold"
+                        CornerRadius="22"
+                        HeightRequest="52"
+                        Clicked="OnViewResultsClicked" />
+
+                <VerticalStackLayout BindableLayout.ItemsSource="{Binding Positions}" Spacing="12">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate>
+                            <Border Padding="16"
+                                    BackgroundColor="{AppThemeBinding Light=White, Dark=#102542}"
+                                    Stroke="{AppThemeBinding Light=#DCEEFF, Dark=#1A3B70}">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="22" />
+                                </Border.StrokeShape>
+                                <VerticalStackLayout Spacing="10">
+                                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                                        <VerticalStackLayout Spacing="3">
+                                            <Label Text="{Binding Position}" FontSize="18" FontAttributes="Bold" TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                                            <Label Text="{Binding Candidates.Count, StringFormat='{}{0} candidate(s)'}" TextColor="{AppThemeBinding Light=#6884A5, Dark=#C8D9F0}" />
+                                        </VerticalStackLayout>
+                                        <Label Grid.Column="1"
+                                               Text="{Binding StatusLabel}"
+                                               VerticalTextAlignment="Center"
+                                               TextColor="#25A9F5" />
+                                    </Grid>
+                                    <Label Text="{Binding ClosesAt, StringFormat='{}Closes {0:dd MMM yyyy, hh:mm tt}'}"
+                                           TextColor="{AppThemeBinding Light=#6884A5, Dark=#C8D9F0}" />
+                                    <Button Text="Open Position"
+                                            BackgroundColor="#0B2A56"
+                                            TextColor="White"
+                                            Clicked="OnOpenPositionClicked" />
+                                </VerticalStackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <controls:PortalBottomNav Grid.Row="1"
+                                  ActiveTab="Voting" />
+    </Grid>
+</ContentPage>

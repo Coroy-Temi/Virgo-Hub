@@ -1,0 +1,90 @@
+@inject VirgoHubService Hub
+
+<nav class="nav-cluster">
+    <div class="nav-section-label">Navigation</div>
+    @if (IsPlatformSuperAdmin)
+    {
+        <NavLink class="nav-link-vgh" href="schools" Match="NavLinkMatch.All">Schools</NavLink>
+    }
+    else if (IsLecturer)
+    {
+        <NavLink class="nav-link-vgh" href="library" Match="NavLinkMatch.All">Materials</NavLink>
+    }
+    else
+    {
+        <NavLink class="nav-link-vgh" href="" Match="NavLinkMatch.All">Overview</NavLink>
+    }
+
+    @if (IsSuperAdmin)
+    {
+        <NavLink class="nav-link-vgh" href="admins">Portal Access</NavLink>
+        <NavLink class="nav-link-vgh" href="students">Students</NavLink>
+        <NavLink class="nav-link-vgh" href="events">Events</NavLink>
+        <NavLink class="nav-link-vgh" href="voting">Voting</NavLink>
+        <NavLink class="nav-link-vgh" href="sports">Sports</NavLink>
+        <NavLink class="nav-link-vgh" href="library">Materials</NavLink>
+    }
+
+    @if (AccessibleModules.Contains(AdminModule.Students) && !IsSuperAdmin)
+    {
+        <NavLink class="nav-link-vgh" href="students">Students</NavLink>
+    }
+
+    @if (AccessibleModules.Contains(AdminModule.Events) && !IsSuperAdmin)
+    {
+        <NavLink class="nav-link-vgh" href="events">Events</NavLink>
+    }
+
+    @if (AccessibleModules.Contains(AdminModule.Voting) && !IsSuperAdmin)
+    {
+        <NavLink class="nav-link-vgh" href="voting">Voting</NavLink>
+    }
+
+    @if (AccessibleModules.Contains(AdminModule.Sports) && !IsSuperAdmin)
+    {
+        <NavLink class="nav-link-vgh" href="sports">Sports</NavLink>
+    }
+
+    @if (AccessibleModules.Contains(AdminModule.Library) && !IsSuperAdmin && !IsLecturer)
+    {
+        <NavLink class="nav-link-vgh" href="library">Materials</NavLink>
+    }
+
+    @if (IsSuperAdmin || IsPorter || AccessibleModules.Contains(AdminModule.Complaints))
+    {
+        <NavLink class="nav-link-vgh" href="complaints">Complaints</NavLink>
+    }
+</nav>
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthenticationStateTask { get; set; }
+
+    private bool IsSuperAdmin { get; set; }
+    private bool IsPlatformSuperAdmin { get; set; }
+    private bool IsPorter { get; set; }
+    private bool IsLecturer { get; set; }
+    private HashSet<AdminModule> AccessibleModules { get; set; } = [];
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (AuthenticationStateTask is null)
+        {
+            IsSuperAdmin = false;
+            IsPlatformSuperAdmin = false;
+            IsPorter = false;
+            IsLecturer = false;
+            AccessibleModules = [];
+            return;
+        }
+
+        var authState = await AuthenticationStateTask;
+        var userId = authState.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var portalUser = string.IsNullOrWhiteSpace(userId) ? null : Hub.GetUserById(userId);
+        IsPlatformSuperAdmin = portalUser?.Role == UserRole.PlatformSuperAdmin;
+        IsSuperAdmin = portalUser?.Role == UserRole.SuperAdmin;
+        IsPorter = portalUser?.Role == UserRole.Porter;
+        IsLecturer = portalUser?.Role == UserRole.Lecturer;
+        AccessibleModules = Hub.GetAccessibleModules(portalUser).ToHashSet();
+    }
+}

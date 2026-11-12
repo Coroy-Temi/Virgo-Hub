@@ -1,0 +1,525 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="VirgoHub.Mobile.MainPage"
+             Title="VirgoHub"
+             NavigationPage.HasNavigationBar="False"
+             BackgroundColor="{AppThemeBinding Light=#EFF7FF, Dark=#07172C}">
+    <Grid>
+        <ScrollView>
+            <VerticalStackLayout Padding="22,42,22,42"
+                                 Spacing="18"
+                                 VerticalOptions="Center">
+                <Border Padding="28"
+                        BackgroundColor="{AppThemeBinding Light=White, Dark=#102542}"
+                        Stroke="{AppThemeBinding Light=#DCEEFF, Dark=#1A3B70}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="34" />
+                    </Border.StrokeShape>
+                    <Border.Shadow>
+                        <Shadow Brush="#200F4BA8"
+                                Offset="0,10"
+                                Radius="22"
+                                Opacity="0.45" />
+                    </Border.Shadow>
+                    <VerticalStackLayout Spacing="20">
+                        <VerticalStackLayout Spacing="10">
+                            <Image x:Name="LoginLogo"
+                                   Source="virgohub_vh_logo.svg"
+                                   HeightRequest="60"
+                                   WidthRequest="60"
+                                   HorizontalOptions="Center" />
+                            <Label Text="VirgoHub"
+                                   FontSize="34"
+                                   FontAttributes="Bold"
+                                   HorizontalTextAlignment="Center"
+                                   TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                            <Label Text="{Binding PlatformHeadline}"
+                                   FontSize="15"
+                                   HorizontalTextAlignment="Center"
+                                   TextColor="{AppThemeBinding Light=#6A84A6, Dark=#C8D9F0}" />
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout IsVisible="{Binding IsIntroStage}" Spacing="18">
+                            <Label Text="{Binding PlatformSummary}"
+                                   FontSize="14"
+                                   LineBreakMode="WordWrap"
+                                   HorizontalTextAlignment="Center"
+                                   TextColor="{AppThemeBinding Light=#6A84A6, Dark=#C8D9F0}" />
+
+                            <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                                <Border Grid.Column="0"
+                                        Padding="16"
+                                        BackgroundColor="{AppThemeBinding Light=#F5FAFF, Dark=#0B2249}"
+                                        StrokeThickness="0">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="24" />
+                                    </Border.StrokeShape>
+                                    <VerticalStackLayout Spacing="6">
+                                        <Label Text="School Use"
+                                               FontAttributes="Bold"
+                                               TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                                        <Label Text="Hostels, sports, voting, complaints, and school materials."
+                                               FontSize="12"
+                                               TextColor="{AppThemeBinding Light=#6A84A6, Dark=#C8D9F0}" />
+                                    </VerticalStackLayout>
+                                </Border>
+
+                                <Border Grid.Column="1"
+                                        Padding="16"
+                                        BackgroundColor="{AppThemeBinding Light=#F5FAFF, Dark=#0B2249}"
+                                        StrokeThickness="0">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="24" />
+                                    </Border.StrokeShape>
+                                    <VerticalStackLayout Spacing="6">
+                                        <Label Text="Personal Use"
+                                               FontAttributes="Bold"
+                                               TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                                        <Label Text="Tutoring groups, teaching materials, reminders, and focused study."
+                                               FontSize="12"
+                                               TextColor="{AppThemeBinding Light=#6A84A6, Dark=#C8D9F0}" />
+                                    </VerticalStackLayout>
+                                </Border>
+                            </Grid>
+
+                            <Button Text="Proceed"
+                                    CornerRadius="26"
+                                    HeightRequest="62"
+                                    BackgroundColor="#25A9F5"
+                                    TextColor="White"
+                                    FontSize="18"
+                                    FontAttributes="Bold"
+                                    Clicked="OnProceedClicked" />
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout IsVisible="{Binding IsModeSelectionStage}" Spacing="14">
+                            <Button Text="School Use"
+                                    CornerRadius="26"
+                                    HeightRequest="60"
+                                    BackgroundColor="#25A9F5"
+                                    TextColor="White"
+                                    FontSize="17"
+                                    FontAttributes="Bold"
+                                    Clicked="OnSchoolUseClicked" />
+
+                            <Button Text="Personal Use"
+                                    CornerRadius="26"
+                                    HeightRequest="60"
+                                    BackgroundColor="{AppThemeBinding Light=#0B2A56, Dark=#173E71}"
+                                    TextColor="White"
+                                    FontSize="17"
+                                    FontAttributes="Bold"
+                                    Clicked="OnPersonalUseClicked" />
+
+                            <Button Text="Back"
+                                    CornerRadius="22"
+                                    HeightRequest="48"
+                                    BackgroundColor="{AppThemeBinding Light=#EAF4FF, Dark=#0B2249}"
+                                    TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}"
+                                    Clicked="OnBackToIntroClicked" />
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout IsVisible="{Binding IsSchoolLoginStage}" Spacing="16">
+                            <Label Text="School Login"
+                                   FontSize="26"
+                                   FontAttributes="Bold"
+                                   TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+
+                            <Label Text="Connect to your VirgoHub server, choose your school, then sign in with the approved school mail. VirgoHub will remember the last server and school you used on this device."
+                                   FontSize="13"
+                                   TextColor="{AppThemeBinding Light=#6A84A6, Dark=#C8D9F0}" />
+
+                            <Border Padding="18,14"
+                                    BackgroundColor="{AppThemeBinding Light=White, Dark=#0B2249}"
+                                    Stroke="{AppThemeBinding Light=#D6ECFF, Dark=#28538E}">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="24" />
+                                </Border.StrokeShape>
+                                <VerticalStackLayout Spacing="10">
+                                    <Label Text="Server address"
+                                           FontAttributes="Bold"
+                                           TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                                    <Entry Text="{Binding ApiBaseUrl}"
+                                           BackgroundColor="Transparent"
+                                           Placeholder="https://your-school.ngrok-free.app"
+                                           PlaceholderColor="{AppThemeBinding Light=#7F94AE, Dark=#A9C0DE}" />
+                                    <Button Text="Load school list"
+                                            CornerRadius="18"
+                                            HeightRequest="46"
+                                            BackgroundColor="{AppThemeBinding Light=#EAF4FF, Dark=#173E71}"
+                                            TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}"
+                                            Clicked="OnRefreshSchoolsClicked" />
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <Border Padding="18,14"
+                                    BackgroundColor="{AppThemeBinding Light=White, Dark=#0B2249}"
+                                    Stroke="{AppThemeBinding Light=#D6ECFF, Dark=#28538E}">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="24" />
+                                </Border.StrokeShape>
+                                <VerticalStackLayout Spacing="10">
+                                    <Label Text="School"
+                                           FontAttributes="Bold"
+                                           TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                                    <Picker ItemsSource="{Binding Schools}"
+                                            SelectedItem="{Binding SelectedSchool}"
+                                            ItemDisplayBinding="{Binding Name}"
+                                           Title="Choose your school" />
+                                    <Label Text="{Binding SelectedSchoolHint}"
+                                           FontSize="12"
+                                           LineBreakMode="WordWrap"
+                                           TextColor="{AppThemeBinding Light=#6A84A6, Dark=#C8D9F0}" />
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <Border Padding="18,14"
+                                    BackgroundColor="{AppThemeBinding Light=#F8FBFF, Dark=#0B2249}"
+                                    Stroke="{AppThemeBinding Light=#D6ECFF, Dark=#28538E}">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="24" />
+                                </Border.StrokeShape>
+                                <VerticalStackLayout Spacing="8">
+                                    <Label Text="{Binding SelectedSchoolTitle}"
+                                           FontSize="18"
+                                           FontAttributes="Bold"
+                                           TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                                    <Label Text="{Binding SelectedSchoolDomainBadge}"
+                                           FontSize="12"
+                                           FontAttributes="Bold"
+                                           TextColor="#25A9F5" />
+                                    <Label Text="{Binding SelectedSchoolDescription}"
+                                           FontSize="12"
+                                           LineBreakMode="WordWrap"
+                                           TextColor="{AppThemeBinding Light=#6A84A6, Dark=#C8D9F0}" />
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <Border Padding="18,14"
+                                    BackgroundColor="{AppThemeBinding Light=White, Dark=#0B2249}"
+                                    Stroke="{AppThemeBinding Light=#D6ECFF, Dark=#28538E}">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="24" />
+                                </Border.StrokeShape>
+                                <Grid ColumnDefinitions="Auto,*"
+                                      ColumnSpacing="14">
+                                    <Image Grid.Column="0"
+                                           Source="icon_mail.svg"
+                                           HeightRequest="30"
+                                           WidthRequest="30"
+                                           VerticalOptions="Center" />
+                                    <Entry Grid.Column="1"
+                                           Text="{Binding Email}"
+                                           BackgroundColor="Transparent"
+                                           Keyboard="Email"
+                                           FontSize="16"
+                                           Placeholder="School mail"
+                                           PlaceholderColor="{AppThemeBinding Light=#7F94AE, Dark=#A9C0DE}" />
+                                </Grid>
+                            </Border>
+
+                            <Button Text="Send Login Code"
+                                    CornerRadius="26"
+                                    HeightRequest="62"
+                                    BackgroundColor="#25A9F5"
+                                    TextColor="White"
+                                    FontSize="18"
+                                    FontAttributes="Bold"
+                                    Clicked="OnSendCodeClicked" />
+
+                            <Button Text="Back"
+                                    CornerRadius="22"
+                                    HeightRequest="48"
+                                    BackgroundColor="{AppThemeBinding Light=#EAF4FF, Dark=#0B2249}"
+                                    TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}"
+                                    Clicked="OnBackToModesClicked" />
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout IsVisible="{Binding IsPersonalRoleStage}" Spacing="14">
+                            <Label Text="Personal Use"
+                                   FontSize="26"
+                                   FontAttributes="Bold"
+                                   TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                            <Label Text="Choose whether you are entering as a lecturer or as a learner under tutoring."
+                                   FontSize="13"
+                                   TextColor="{AppThemeBinding Light=#6A84A6, Dark=#C8D9F0}" />
+
+                            <Button Text="I am a Lecturer"
+                                    CornerRadius="26"
+                                    HeightRequest="60"
+                                    BackgroundColor="#25A9F5"
+                                    TextColor="White"
+                                    FontSize="17"
+                                    FontAttributes="Bold"
+                                    Clicked="OnLecturerModeClicked" />
+
+                            <Button Text="I am a Student or Learner"
+                                    CornerRadius="26"
+                                    HeightRequest="60"
+                                    BackgroundColor="{AppThemeBinding Light=#0B2A56, Dark=#173E71}"
+                                    TextColor="White"
+                                    FontSize="17"
+                                    FontAttributes="Bold"
+                                    Clicked="OnStudentModeClicked" />
+
+                            <Button Text="Back"
+                                    CornerRadius="22"
+                                    HeightRequest="48"
+                                    BackgroundColor="{AppThemeBinding Light=#EAF4FF, Dark=#0B2249}"
+                                    TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}"
+                                    Clicked="OnBackToModesClicked" />
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout IsVisible="{Binding IsPersonalLoginStage}" Spacing="16">
+                            <Label Text="Personal Workspace Login"
+                                   FontSize="26"
+                                   FontAttributes="Bold"
+                                   TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+
+                            <Label Text="{Binding PersonalLoginHint}"
+                                   FontSize="13"
+                                   TextColor="{AppThemeBinding Light=#6A84A6, Dark=#C8D9F0}" />
+
+                            <Border Padding="18,14"
+                                    BackgroundColor="{AppThemeBinding Light=White, Dark=#0B2249}"
+                                    Stroke="{AppThemeBinding Light=#D6ECFF, Dark=#28538E}">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="24" />
+                                </Border.StrokeShape>
+                                <VerticalStackLayout Spacing="10">
+                                    <Label Text="Server address"
+                                           FontAttributes="Bold"
+                                           TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                                    <Entry Text="{Binding ApiBaseUrl}"
+                                           BackgroundColor="Transparent"
+                                           Placeholder="https://your-school.ngrok-free.app"
+                                           PlaceholderColor="{AppThemeBinding Light=#7F94AE, Dark=#A9C0DE}" />
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <Border Padding="18,14"
+                                    BackgroundColor="{AppThemeBinding Light=White, Dark=#0B2249}"
+                                    Stroke="{AppThemeBinding Light=#D6ECFF, Dark=#28538E}">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="24" />
+                                </Border.StrokeShape>
+                                <Grid ColumnDefinitions="Auto,*"
+                                      ColumnSpacing="14">
+                                    <Image Grid.Column="0"
+                                           Source="icon_mail.svg"
+                                           HeightRequest="30"
+                                           WidthRequest="30"
+                                           VerticalOptions="Center" />
+                                    <Entry Grid.Column="1"
+                                           Text="{Binding Email}"
+                                           BackgroundColor="Transparent"
+                                           Keyboard="Email"
+                                           FontSize="16"
+                                           Placeholder="Email address"
+                                           PlaceholderColor="{AppThemeBinding Light=#7F94AE, Dark=#A9C0DE}" />
+                                </Grid>
+                            </Border>
+
+                            <Button Text="Send Login Code"
+                                    CornerRadius="26"
+                                    HeightRequest="62"
+                                    BackgroundColor="#25A9F5"
+                                    TextColor="White"
+                                    FontSize="18"
+                                    FontAttributes="Bold"
+                                    Clicked="OnSendCodeClicked" />
+
+                            <Button Text="Back"
+                                    CornerRadius="22"
+                                    HeightRequest="48"
+                                    BackgroundColor="{AppThemeBinding Light=#EAF4FF, Dark=#0B2249}"
+                                    TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}"
+                                    Clicked="OnBackToModesClicked" />
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Label Text="{Binding InfoMessage}"
+                       IsVisible="{Binding HasInfoMessage}"
+                       TextColor="{Binding FeedbackColor}"
+                       FontSize="14"
+                       HorizontalTextAlignment="Center"
+                       LineBreakMode="WordWrap" />
+
+                <ActivityIndicator IsRunning="{Binding IsPageBusy}"
+                                   IsVisible="{Binding IsPageBusy}"
+                                   Color="#25A9F5" />
+
+                <Border IsVisible="{Binding HasDebugCode}"
+                        Padding="16"
+                        BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#102542}"
+                        Stroke="{AppThemeBinding Light=#DCEEFF, Dark=#1A3B70}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="22" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Test verification code"
+                               FontAttributes="Bold"
+                               TextColor="#25A9F5" />
+                        <Label Text="{Binding DebugCodeMessage}"
+                               TextColor="{AppThemeBinding Light=#0B2A56, Dark=#D6E8FF}"
+                               LineBreakMode="WordWrap" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border IsVisible="{Binding ShowCodeEntry}"
+                        Padding="22"
+                        BackgroundColor="{AppThemeBinding Light=White, Dark=#102542}"
+                        Stroke="{AppThemeBinding Light=#DCEEFF, Dark=#1A3B70}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="28" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout Spacing="14">
+                        <Label Text="Verification Code"
+                               FontSize="24"
+                               FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                        <Border Padding="16,6"
+                                BackgroundColor="{AppThemeBinding Light=#F8FBFF, Dark=#0B2249}"
+                                StrokeThickness="0">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="18" />
+                            </Border.StrokeShape>
+                            <Entry Text="{Binding OtpCode}"
+                                   BackgroundColor="Transparent"
+                                   Keyboard="Numeric"
+                                   FontSize="16"
+                                   Placeholder="Enter the 6-digit code"
+                                   PlaceholderColor="{AppThemeBinding Light=#7F94AE, Dark=#A9C0DE}" />
+                        </Border>
+                        <Button Text="Continue"
+                                CornerRadius="24"
+                                HeightRequest="58"
+                                BackgroundColor="#0B2A56"
+                                TextColor="White"
+                                FontSize="17"
+                                FontAttributes="Bold"
+                                Clicked="OnVerifyCodeClicked" />
+                    </VerticalStackLayout>
+                </Border>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <Grid IsVisible="{Binding ShowLaunchExperience}"
+              BackgroundColor="{AppThemeBinding Light=#F7FAFF, Dark=#07172C}">
+            <Grid RowDefinitions="*,Auto,*"
+                  Padding="24">
+                <VerticalStackLayout Grid.Row="1"
+                                     HorizontalOptions="Center"
+                                     Spacing="18">
+                    <Grid WidthRequest="220"
+                          HeightRequest="220">
+                        <Border x:Name="LaunchHalo"
+                                WidthRequest="212"
+                                HeightRequest="212"
+                                BackgroundColor="{AppThemeBinding Light=#D9EBFF, Dark=#113260}"
+                                Opacity="0.22"
+                                StrokeThickness="0">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="110" />
+                            </Border.StrokeShape>
+                        </Border>
+
+                        <Border x:Name="LaunchHaloInner"
+                                WidthRequest="156"
+                                HeightRequest="156"
+                                HorizontalOptions="Center"
+                                VerticalOptions="Center"
+                                BackgroundColor="{AppThemeBinding Light=#EAF4FF, Dark=#173E71}"
+                                Opacity="0.75"
+                                StrokeThickness="0">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="84" />
+                            </Border.StrokeShape>
+                        </Border>
+
+                        <Border x:Name="LaunchOrbitLeft"
+                                WidthRequest="30"
+                                HeightRequest="30"
+                                HorizontalOptions="Start"
+                                VerticalOptions="Center"
+                                BackgroundColor="#0F4BA8"
+                                Opacity="0.72"
+                                TranslationX="22"
+                                TranslationY="-38"
+                                StrokeThickness="0">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="15" />
+                            </Border.StrokeShape>
+                        </Border>
+
+                        <Border x:Name="LaunchOrbitRight"
+                                WidthRequest="22"
+                                HeightRequest="22"
+                                HorizontalOptions="End"
+                                VerticalOptions="Center"
+                                BackgroundColor="#6AAEFF"
+                                Opacity="0.82"
+                                TranslationX="-18"
+                                TranslationY="42"
+                                StrokeThickness="0">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="11" />
+                            </Border.StrokeShape>
+                        </Border>
+
+                        <Border x:Name="LaunchLogoShell"
+                                Padding="16"
+                                HorizontalOptions="Center"
+                                VerticalOptions="Center"
+                                BackgroundColor="{AppThemeBinding Light=White, Dark=#102542}"
+                                Stroke="{AppThemeBinding Light=#D8E5FB, Dark=#1A3B70}">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="28" />
+                            </Border.StrokeShape>
+                            <Image x:Name="LaunchLogo"
+                                   Source="virgohub_vh_logo.svg"
+                                   HeightRequest="72"
+                                   WidthRequest="72" />
+                        </Border>
+                    </Grid>
+
+                    <VerticalStackLayout x:Name="LaunchCaption"
+                                         Spacing="6">
+                        <Label Text="VirgoHub"
+                               FontSize="30"
+                               FontAttributes="Bold"
+                               HorizontalTextAlignment="Center"
+                               TextColor="{AppThemeBinding Light=#082A63, Dark=White}" />
+                        <Label Text="Opening your connected learning space"
+                               FontSize="13"
+                               HorizontalTextAlignment="Center"
+                               TextColor="{AppThemeBinding Light=#5B78A2, Dark=#C8D9F0}" />
+                    </VerticalStackLayout>
+
+                    <Grid x:Name="LaunchTrack"
+                          WidthRequest="210"
+                          HeightRequest="14">
+                        <Border BackgroundColor="{AppThemeBinding Light=#E8F1FF, Dark=#14335D}"
+                                StrokeThickness="0">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="10" />
+                            </Border.StrokeShape>
+                        </Border>
+                        <Border x:Name="LaunchShuttle"
+                                WidthRequest="68"
+                                HeightRequest="14"
+                                HorizontalOptions="Start"
+                                BackgroundColor="#0F4BA8"
+                                StrokeThickness="0">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="10" />
+                            </Border.StrokeShape>
+                        </Border>
+                    </Grid>
+                </VerticalStackLayout>
+            </Grid>
+        </Grid>
+    </Grid>
+</ContentPage>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:VirgoHub.Mobile.Controls"
+             x:Class="VirgoHub.Mobile.NotificationActivityPage"
+             Title="Notification Activity"
+             NavigationPage.HasNavigationBar="False"
+             BackgroundColor="{AppThemeBinding Light=#EFF7FF, Dark=#07172C}">
+    <Grid RowDefinitions="*,Auto">
+        <ScrollView Grid.Row="0">
+            <VerticalStackLayout Padding="20,18,20,22" Spacing="18">
+                <Grid ColumnDefinitions="Auto,*"
+                      ColumnSpacing="14">
+                    <Button Text="Back"
+                            Padding="14,8"
+                            CornerRadius="16"
+                            BackgroundColor="{AppThemeBinding Light=#EAF4FF, Dark=#173E71}"
+                            TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}"
+                            Clicked="OnBackClicked" />
+                    <VerticalStackLayout Grid.Column="1" Spacing="4">
+                        <Label Text="Notification Activity"
+                               FontSize="28"
+                               FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                        <Label Text="{Binding ActivityPageSummary}"
+                               FontSize="13"
+                               TextColor="{AppThemeBinding Light=#6884A5, Dark=#C8D9F0}" />
+                    </VerticalStackLayout>
+                </Grid>
+
+                <HorizontalStackLayout Spacing="10">
+                    <Button Text="All" Clicked="OnAllClicked" />
+                    <Button Text="{Binding UpdatesFilterLabel}" Clicked="OnElectionsClicked" />
+                    <Button Text="{Binding RemindersFilterLabel}" Clicked="OnEventsClicked" />
+                    <Button Text="{Binding AccessFilterLabel}" Clicked="OnReportsClicked" />
+                    <Button Text="{Binding NewsFilterLabel}" Clicked="OnNewsClicked" />
+                </HorizontalStackLayout>
+
+                <VerticalStackLayout BindableLayout.ItemsSource="{Binding VisibleNotifications}" Spacing="12">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate>
+                            <Border Padding="16"
+                                    BackgroundColor="{AppThemeBinding Light=White, Dark=#102542}"
+                                    Stroke="{AppThemeBinding Light=#DCEEFF, Dark=#1A3B70}">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="22" />
+                                </Border.StrokeShape>
+                                <VerticalStackLayout Spacing="6">
+                                    <Label Text="{Binding Title}"
+                                           FontSize="17"
+                                           FontAttributes="Bold"
+                                           TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                                    <Label Text="{Binding Message}"
+                                           TextColor="{AppThemeBinding Light=#6884A5, Dark=#C8D9F0}"
+                                           LineBreakMode="WordWrap" />
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <Label Text="{Binding Category}"
+                                               TextColor="#25A9F5" />
+                                        <Label Grid.Column="1"
+                                               Text="{Binding CreatedAt, StringFormat='{}{0:dd MMM, hh:mm tt}'}"
+                                               TextColor="{AppThemeBinding Light=#6884A5, Dark=#C8D9F0}" />
+                                    </Grid>
+                                </VerticalStackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <controls:PortalBottomNav Grid.Row="1"
+                                  ActiveTab="Profile" />
+    </Grid>
+</ContentPage>

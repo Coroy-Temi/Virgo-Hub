@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:VirgoHub.Mobile.Controls"
+             x:Class="VirgoHub.Mobile.PersonalAssessmentDetailPage"
+             Title="Assessment"
+             NavigationPage.HasNavigationBar="False"
+             BackgroundColor="{AppThemeBinding Light=#F3F7FF, Dark=#07172C}">
+    <Grid RowDefinitions="*,Auto">
+        <ScrollView Grid.Row="0">
+            <VerticalStackLayout Padding="18,16,18,20"
+                                 Spacing="18">
+                <Border Padding="18"
+                        BackgroundColor="{AppThemeBinding Light=White, Dark=#102542}"
+                        Stroke="{AppThemeBinding Light=#D8E5FB, Dark=#1A3B70}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="26" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="{Binding Store.SelectedPersonalAssessmentTitle}"
+                               FontSize="24"
+                               FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                        <Label Text="{Binding Store.SelectedPersonalAssessmentMeta}"
+                               FontSize="13"
+                               TextColor="{AppThemeBinding Light=#5B78A2, Dark=#C8D9F0}" />
+                        <Label Text="{Binding StatusSummary}"
+                               FontSize="13"
+                               TextColor="#25A9F5" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Padding="18"
+                        BackgroundColor="{AppThemeBinding Light=White, Dark=#102542}"
+                        Stroke="{AppThemeBinding Light=#D8E5FB, Dark=#1A3B70}"
+                        IsVisible="{Binding HasSubmission}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="22" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Submission Recorded"
+                               FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                        <Label Text="{Binding SubmissionSummary}"
+                               FontSize="13"
+                               TextColor="{AppThemeBinding Light=#5B78A2, Dark=#C8D9F0}" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Padding="18"
+                        BackgroundColor="{AppThemeBinding Light=#EAF7FF, Dark=#0B2249}"
+                        StrokeThickness="0"
+                        IsVisible="{Binding HasSubmission}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="22" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Result released"
+                               FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                        <Label Text="Your score and the correct answers are now visible because this assessment has already been submitted."
+                               FontSize="13"
+                               LineBreakMode="WordWrap"
+                               TextColor="{AppThemeBinding Light=#3D5F8D, Dark=#C8D9F0}" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Padding="18"
+                        BackgroundColor="{AppThemeBinding Light=White, Dark=#102542}"
+                        Stroke="{AppThemeBinding Light=#D8E5FB, Dark=#1A3B70}"
+                        IsVisible="{Binding IsLecturerView}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="22" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Lecturer View"
+                               FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                        <Label Text="{Binding LecturerSummary}"
+                               FontSize="13"
+                               TextColor="{AppThemeBinding Light=#5B78A2, Dark=#C8D9F0}" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Padding="18"
+                        BackgroundColor="{AppThemeBinding Light=White, Dark=#102542}"
+                        Stroke="{AppThemeBinding Light=#D8E5FB, Dark=#1A3B70}"
+                        IsVisible="{Binding IsLecturerView}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="22" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Learner submissions"
+                               FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+
+                        <CollectionView ItemsSource="{Binding SubmissionCards}"
+                                        EmptyView="No learner has submitted this assessment yet.">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Padding="12"
+                                            Margin="0,0,0,10"
+                                            BackgroundColor="{AppThemeBinding Light=#F5FAFF, Dark=#0B2249}"
+                                            StrokeThickness="0">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="18" />
+                                        </Border.StrokeShape>
+                                        <Grid ColumnDefinitions="*,Auto"
+                                              ColumnSpacing="10">
+                                            <VerticalStackLayout Spacing="4">
+                                                <Label Text="{Binding StudentName}"
+                                                       FontAttributes="Bold"
+                                                       TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                                                <Label Text="{Binding ScoreLabel}"
+                                                       TextColor="#25A9F5" />
+                                                <Label Text="{Binding Meta}"
+                                                       FontSize="12"
+                                                       TextColor="{AppThemeBinding Light=#5B78A2, Dark=#C8D9F0}" />
+                                            </VerticalStackLayout>
+                                            <Button Grid.Column="1"
+                                                    Text="Review"
+                                                    BackgroundColor="#25A9F5"
+                                                    TextColor="White"
+                                                    Clicked="OnReviewSubmissionClicked" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Padding="18"
+                        BackgroundColor="{AppThemeBinding Light=#EAF7FF, Dark=#0B2249}"
+                        StrokeThickness="0"
+                        IsVisible="{Binding IsLecturerView}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="22" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="{Binding ReviewedSubmissionHeadline}"
+                               FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                        <Label Text="{Binding ReviewedSubmissionMeta}"
+                               FontSize="13"
+                               TextColor="{AppThemeBinding Light=#3D5F8D, Dark=#C8D9F0}" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <VerticalStackLayout BindableLayout.ItemsSource="{Binding Questions}"
+                                     Spacing="12">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate>
+                            <Border Padding="14"
+                                    BackgroundColor="{AppThemeBinding Light=White, Dark=#102542}"
+                                    Stroke="{AppThemeBinding Light=#D8E5FB, Dark=#1A3B70}">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="18" />
+                                </Border.StrokeShape>
+                                <VerticalStackLayout Spacing="10">
+                                    <Label Text="{Binding Heading}"
+                                           FontAttributes="Bold"
+                                           TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                                    <Label Text="{Binding Prompt}"
+                                           FontSize="15"
+                                           LineBreakMode="WordWrap"
+                                           TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+
+                                    <VerticalStackLayout BindableLayout.ItemsSource="{Binding Options}"
+                                                         Spacing="6">
+                                        <BindableLayout.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Padding="12,10"
+                                                        BackgroundColor="{AppThemeBinding Light=#F5FAFF, Dark=#0B2249}"
+                                                        StrokeThickness="0">
+                                                    <Border.StrokeShape>
+                                                        <RoundRectangle CornerRadius="14" />
+                                                    </Border.StrokeShape>
+                                                    <Label Text="{Binding .}"
+                                                           FontSize="13"
+                                                           TextColor="{AppThemeBinding Light=#5B78A2, Dark=#C8D9F0}" />
+                                                </Border>
+                                            </DataTemplate>
+                                        </BindableLayout.ItemTemplate>
+                                    </VerticalStackLayout>
+
+                                    <Picker Title="Select answer"
+                                            ItemsSource="{Binding OptionKeys}"
+                                            SelectedItem="{Binding SelectedOption}"
+                                            IsVisible="{Binding CanAnswer}" />
+
+                                    <VerticalStackLayout Spacing="4"
+                                                         IsVisible="{Binding ShowReview}">
+                                        <Label Text="{Binding ReviewAnswer}"
+                                               FontSize="13"
+                                               TextColor="#25A9F5" />
+                                        <Label Text="{Binding CorrectAnswer}"
+                                               FontSize="13"
+                                               TextColor="{AppThemeBinding Light=#5B78A2, Dark=#C8D9F0}" />
+                                        <Label Text="{Binding Explanation}"
+                                               FontSize="12"
+                                               LineBreakMode="WordWrap"
+                                               TextColor="{AppThemeBinding Light=#5B78A2, Dark=#C8D9F0}" />
+                                    </VerticalStackLayout>
+                                </VerticalStackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+
+                <Button Text="Submit Assessment"
+                        IsVisible="{Binding CanSubmit}"
+                        BackgroundColor="#25A9F5"
+                        TextColor="White"
+                        FontAttributes="Bold"
+                        HeightRequest="54"
+                        CornerRadius="24"
+                        Clicked="OnSubmitClicked" />
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <controls:PortalBottomNav Grid.Row="1"
+                                  ActiveTab="Events" />
+    </Grid>
+</ContentPage>

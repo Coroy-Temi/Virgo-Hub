@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:VirgoHub.Mobile.Controls"
+             x:Class="VirgoHub.Mobile.PersonalGroupHubPage"
+             Title="Group Hub"
+             NavigationPage.HasNavigationBar="False"
+             BackgroundColor="{AppThemeBinding Light=#F3F8FF, Dark=#07172C}">
+    <Grid RowDefinitions="*,Auto">
+        <ScrollView Grid.Row="0">
+            <VerticalStackLayout Padding="18,16,18,24" Spacing="18">
+                <Border Padding="18"
+                        BackgroundColor="{AppThemeBinding Light=White, Dark=#102542}"
+                        Stroke="{AppThemeBinding Light=#D8E8FF, Dark=#1A3B70}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="26" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="{Binding Group.Title}"
+                               FontSize="24"
+                               FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                        <Label Text="{Binding GroupMeta}"
+                               FontSize="13"
+                               TextColor="#25A9F5" />
+                        <Label Text="{Binding Group.Summary}"
+                               FontSize="13"
+                               LineBreakMode="WordWrap"
+                               TextColor="{AppThemeBinding Light=#5B78A2, Dark=#C8D9F0}" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Padding="18"
+                        BackgroundColor="{AppThemeBinding Light=White, Dark=#102542}"
+                        Stroke="{AppThemeBinding Light=#D8E8FF, Dark=#1A3B70}"
+                        IsVisible="{Binding Store.IsPersonalLecturer}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="24" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Post to Group"
+                               FontSize="20"
+                               FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                        <Entry Text="{Binding PostTitle}"
+                               Placeholder="Post title" />
+                        <Editor Text="{Binding PostMessage}"
+                                Placeholder="Write an update for your learners"
+                                AutoSize="TextChanges"
+                                MinimumHeightRequest="90" />
+                        <Entry Text="{Binding PostAttachmentUrl}"
+                               Placeholder="Optional link" />
+                        <Grid ColumnDefinitions="*,*"
+                              ColumnSpacing="10">
+                            <Button Text="Send Message"
+                                    BackgroundColor="{AppThemeBinding Light=#DCEBFF, Dark=#173E71}"
+                                    TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}"
+                                    Clicked="OnSendMessageClicked" />
+                            <Button Grid.Column="1"
+                                    Text="Post Announcement"
+                                    BackgroundColor="#25A9F5"
+                                    TextColor="White"
+                                    Clicked="OnPostAnnouncementClicked" />
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Padding="18"
+                        BackgroundColor="{AppThemeBinding Light=White, Dark=#102542}"
+                        Stroke="{AppThemeBinding Light=#D8E8FF, Dark=#1A3B70}"
+                        IsVisible="{Binding Store.IsPersonalLearner}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="24" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Message Lecturer"
+                               FontSize="20"
+                               FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                        <Editor Text="{Binding ReplyMessage}"
+                                Placeholder="Ask a question or send an update"
+                                AutoSize="TextChanges"
+                                MinimumHeightRequest="90" />
+                        <Entry Text="{Binding ReplyAttachmentUrl}"
+                               Placeholder="Optional link" />
+                        <Button Text="Send Reply"
+                                BackgroundColor="#25A9F5"
+                                TextColor="White"
+                                Clicked="OnSendReplyClicked" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Padding="18"
+                        BackgroundColor="{AppThemeBinding Light=White, Dark=#102542}"
+                        Stroke="{AppThemeBinding Light=#D8E8FF, Dark=#1A3B70}"
+                        IsVisible="{Binding Store.IsPersonalLecturer}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="24" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Share Material"
+                               FontSize="20"
+                               FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                        <Entry Text="{Binding MaterialTitle}"
+                               Placeholder="Material title" />
+                        <Entry Text="{Binding MaterialType}"
+                               Placeholder="Material type, for example Outline or Slides" />
+                        <Entry Text="{Binding MaterialLink}"
+                               Placeholder="Material link" />
+                        <Editor Text="{Binding MaterialSummary}"
+                                Placeholder="Short material summary"
+                                AutoSize="TextChanges"
+                                MinimumHeightRequest="90" />
+                        <Button Text="Publish Material"
+                                BackgroundColor="#25A9F5"
+                                TextColor="White"
+                                Clicked="OnPublishMaterialClicked" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Padding="18"
+                        BackgroundColor="{AppThemeBinding Light=White, Dark=#102542}"
+                        Stroke="{AppThemeBinding Light=#D8E8FF, Dark=#1A3B70}"
+                        IsVisible="{Binding Store.IsPersonalLecturer}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="24" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Create Assignment"
+                               FontSize="20"
+                               FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                        <Entry Text="{Binding AssignmentTitle}"
+                               Placeholder="Assignment title" />
+                        <Editor Text="{Binding AssignmentInstructions}"
+                                Placeholder="Assignment instructions"
+                                AutoSize="TextChanges"
+                                MinimumHeightRequest="90" />
+                        <Entry Text="{Binding AssignmentLink}"
+                               Placeholder="Optional brief link" />
+                        <Entry Text="{Binding AssignmentDueDays}"
+                               Placeholder="Due in days, for example 7"
+                               Keyboard="Numeric" />
+                        <Button Text="Publish Assignment"
+                                BackgroundColor="#25A9F5"
+                                TextColor="White"
+                                Clicked="OnPublishAssignmentClicked" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Padding="18"
+                        BackgroundColor="{AppThemeBinding Light=White, Dark=#102542}"
+                        Stroke="{AppThemeBinding Light=#D8E8FF, Dark=#1A3B70}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="24" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout Spacing="12">
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                            <Label Text="Group Feed"
+                                   FontSize="20"
+                                   FontAttributes="Bold"
+                                   TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                            <Button Grid.Column="1"
+                                    Text="Refresh"
+                                    BackgroundColor="{AppThemeBinding Light=#DCEBFF, Dark=#173E71}"
+                                    TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}"
+                                    Clicked="OnRefreshClicked" />
+                        </Grid>
+                        <CollectionView ItemsSource="{Binding VisiblePosts}"
+                                        EmptyView="Group posts and updates will appear here.">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Padding="14"
+                                            Margin="0,0,0,10"
+                                            BackgroundColor="{AppThemeBinding Light=#F5FAFF, Dark=#0B2249}"
+                                            StrokeThickness="0">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="18" />
+                                        </Border.StrokeShape>
+                                        <VerticalStackLayout Spacing="5">
+                                            <Label Text="{Binding Title}"
+                                                   FontAttributes="Bold"
+                                                   TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                                            <Label Text="{Binding Message}"
+                                                   FontSize="13"
+                                                   LineBreakMode="WordWrap"
+                                                   TextColor="{AppThemeBinding Light=#5B78A2, Dark=#C8D9F0}" />
+                                            <Label Text="{Binding AuthorName}"
+                                                   FontSize="12"
+                                                   TextColor="#25A9F5" />
+                                        </VerticalStackLayout>
+                                    </Border>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Padding="18"
+                        BackgroundColor="{AppThemeBinding Light=White, Dark=#102542}"
+                        Stroke="{AppThemeBinding Light=#D8E8FF, Dark=#1A3B70}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="24" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Assignments"
+                               FontSize="20"
+                               FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                        <CollectionView ItemsSource="{Binding VisibleAssignments}"
+                                        EmptyView="Assignments shared in this group will appear here.">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Padding="14"
+                                            Margin="0,0,0,10"
+                                            BackgroundColor="{AppThemeBinding Light=#F5FAFF, Dark=#0B2249}"
+                                            StrokeThickness="0">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="18" />
+                                        </Border.StrokeShape>
+                                        <VerticalStackLayout Spacing="6">
+                                            <Label Text="{Binding Title}"
+                                                   FontAttributes="Bold"
+                                                   TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                                            <Label Text="{Binding Instructions}"
+                                                   FontSize="13"
+                                                   LineBreakMode="WordWrap"
+                                                   TextColor="{AppThemeBinding Light=#5B78A2, Dark=#C8D9F0}" />
+                                            <Label Text="{Binding DueAt, StringFormat='{}Due: {0:dd MMM yyyy, hh:mm tt}'}"
+                                                   FontSize="12"
+                                                   TextColor="#25A9F5" />
+                                            <Button Text="Open"
+                                                    BackgroundColor="#25A9F5"
+                                                    TextColor="White"
+                                                    Clicked="OnAssignmentActionClicked" />
+                                        </VerticalStackLayout>
+                                    </Border>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </VerticalStackLayout>
+                </Border>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <controls:PortalBottomNav Grid.Row="1"
+                                  ActiveTab="Voting" />
+    </Grid>
+</ContentPage>

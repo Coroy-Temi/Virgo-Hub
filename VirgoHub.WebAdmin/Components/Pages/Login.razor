@@ -1,0 +1,169 @@
+@page "/login"
+@layout Layout.EmptyLayout
+
+@inject NavigationManager Navigation
+@inject VirgoHubService Hub
+
+<PageTitle>VirgoHub Portal Login</PageTitle>
+
+<div class="login-shell login-shell-centered">
+    <section class="login-panel login-panel-centered">
+        <div class="login-card login-card-compact">
+            <div class="login-orb"></div>
+            <div class="login-card-inner">
+                <div class="brand-mark brand-mark-centered">
+                    <img src="/images/virgohub-vh-logo.svg" alt="VirgoHub VH logo" />
+                </div>
+
+                <div class="section-kicker login-kicker-centered">Secure Web Portal</div>
+                <h2 class="login-title-centered">Super Admin</h2>
+
+                @if (!string.IsNullOrWhiteSpace(statusMessage))
+                {
+                    <div class="toast-banner @statusType">@statusMessage</div>
+                }
+
+                <div class="login-form-shell">
+                <form method="post" action="/auth/login" class="login-form">
+                    <input type="hidden" name="returnUrl" value="@ReturnUrl" />
+
+                    <label>
+                        <span class="sr-only">Portal email or porter staff ID</span>
+                        <input name="identifier"
+                               autocomplete="username"
+                               required
+                               placeholder="Portal email or porter staff ID" />
+                    </label>
+
+                    <label>
+                        <span class="sr-only">Password</span>
+                        <input name="password"
+                               type="password"
+                               autocomplete="current-password"
+                               required
+                               placeholder="Password" />
+                    </label>
+
+                    <button class="vgh-button login-button" type="submit">Open portal</button>
+                </form>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthenticationStateTask { get; set; }
+
+    [SupplyParameterFromQuery]
+    private string? Error { get; set; }
+
+    [SupplyParameterFromQuery]
+    private string? ReturnUrl { get; set; }
+
+    [SupplyParameterFromQuery]
+    private int? SignedOut { get; set; }
+
+    private string statusMessage = string.Empty;
+    private string statusType = "ok";
+
+    protected override async Task OnInitializedAsync()
+    {
+        ReturnUrl = NormalizeReturnUrl(ReturnUrl);
+
+        if (AuthenticationStateTask is not null)
+        {
+            var authState = await AuthenticationStateTask;
+            if (authState.User.Identity?.IsAuthenticated == true)
+            {
+                var userId = authState.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var portalUser = string.IsNullOrWhiteSpace(userId) ? null : Hub.GetUserById(userId);
+                Navigation.NavigateTo(ResolvePortalDestination(portalUser, ReturnUrl), forceLoad: true);
+                return;
+            }
+        }
+
+        if (!string.IsNullOrWhiteSpace(Error))
+        {
+            statusMessage = Error;
+            statusType = "error";
+        }
+        else if (SignedOut == 1)
+        {
+            statusMessage = "Signed out.";
+            statusType = "ok";
+        }
+    }
+
+    private static string NormalizeReturnUrl(string? rawValue)
+    {
+        if (string.IsNullOrWhiteSpace(rawValue))
+        {
+            return "/";
+        }
+
+        var value = Uri.UnescapeDataString(rawValue);
+        return value.StartsWith('/') && !value.StartsWith("//", StringComparison.Ordinal) ? value : "/";
+    }
+
+    private string ResolvePortalDestination(UserProfile? portalUser, string? requestedUrl)
+    {
+        var normalized = NormalizeReturnUrl(requestedUrl);
+        if (portalUser is null)
+        {
+            return normalized;
+        }
+
+        return IsRouteAllowed(portalUser, normalized)
+            ? normalized
+            : GetDefaultPortalRoute(portalUser.Role);
+    }
+
+    private bool IsRouteAllowed(UserProfile portalUser, string requestedUrl)
+    {
+        var routePath = GetRoutePath(requestedUrl);
+
+        return routePath switch
+        {
+            "/" => portalUser.Role is UserRole.SuperAdmin or UserRole.Admin or UserRole.Porter,
+            "/schools" => portalUser.Role == UserRole.PlatformSuperAdmin,
+            "/admins" => portalUser.Role == UserRole.SuperAdmin,
+            "/students" => portalUser.Role == UserRole.SuperAdmin || Hub.CanAccessModule(portalUser.Id, AdminModule.Students),
+            "/events" => portalUser.Role == UserRole.SuperAdmin || Hub.CanAccessModule(portalUser.Id, AdminModule.Events),
+            "/voting" => portalUser.Role == UserRole.SuperAdmin || Hub.CanAccessModule(portalUser.Id, AdminModule.Voting),
+            "/sports" => portalUser.Role == UserRole.SuperAdmin || Hub.CanAccessModule(portalUser.Id, AdminModule.Sports),
+            "/library" => portalUser.Role == UserRole.SuperAdmin || portalUser.Role == UserRole.Lecturer || Hub.CanAccessModule(portalUser.Id, AdminModule.Library),
+            "/complaints" => portalUser.Role == UserRole.SuperAdmin || portalUser.Role == UserRole.Porter || Hub.CanAccessModule(portalUser.Id, AdminModule.Complaints),
+            "/login" => false,
+            _ => false
+        };
+    }
+
+    private static string GetDefaultPortalRoute(UserRole role) =>
+        role switch
+        {
+            UserRole.PlatformSuperAdmin => "/schools",
+            UserRole.Lecturer => "/library",
+            UserRole.Porter => "/complaints",
+            _ => "/"
+        };
+
+    private static string GetRoutePath(string requestedUrl)
+    {
+        var questionIndex = requestedUrl.IndexOf('?');
+        if (questionIndex >= 0)
+        {
+            requestedUrl = requestedUrl[..questionIndex];
+        }
+
+        if (string.IsNullOrWhiteSpace(requestedUrl))
+        {
+            return "/";
+        }
+
+        return requestedUrl.Length > 1
+            ? requestedUrl.TrimEnd('/')
+            : requestedUrl;
+    }
+}

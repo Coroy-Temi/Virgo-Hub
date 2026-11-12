@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:VirgoHub.Mobile.Controls"
+             x:Class="VirgoHub.Mobile.SecurityPage"
+             Title="Security"
+             NavigationPage.HasNavigationBar="False"
+             BackgroundColor="{AppThemeBinding Light=#EFF7FF, Dark=#07172C}">
+    <Grid RowDefinitions="*,Auto">
+        <ScrollView Grid.Row="0">
+            <VerticalStackLayout Padding="20,18,20,22" Spacing="18">
+                <Grid ColumnDefinitions="Auto,*"
+                      ColumnSpacing="14">
+                    <Label Text="←"
+                           FontSize="28"
+                           VerticalTextAlignment="Center"
+                           TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnBackTapped" />
+                        </Label.GestureRecognizers>
+                    </Label>
+                    <VerticalStackLayout Grid.Column="1" Spacing="4">
+                        <Label Text="Security"
+                               FontSize="28"
+                               FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                        <Label Text="Manage your app theme and the protections around your sign-in session."
+                               FontSize="13"
+                               TextColor="{AppThemeBinding Light=#6884A5, Dark=#C8D9F0}" />
+                    </VerticalStackLayout>
+                </Grid>
+
+                <Border Padding="18"
+                        BackgroundColor="{AppThemeBinding Light=White, Dark=#102542}"
+                        Stroke="{AppThemeBinding Light=#DCEEFF, Dark=#1A3B70}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="26" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout Spacing="16">
+                        <Label Text="Protection Summary"
+                               FontSize="22"
+                               FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                        <Label Text="{Binding Store.SecuritySummary}"
+                               TextColor="{AppThemeBinding Light=#6884A5, Dark=#C8D9F0}"
+                               LineBreakMode="WordWrap" />
+                        <Border Padding="16"
+                                BackgroundColor="{AppThemeBinding Light=#F7FBFF, Dark=#0B2249}"
+                                StrokeThickness="0">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="22" />
+                            </Border.StrokeShape>
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                                <VerticalStackLayout Spacing="3">
+                                    <Label Text="Dark Mode" FontAttributes="Bold" TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                                    <Label Text="Switch between light mode and dark mode across VirgoHub." FontSize="13" TextColor="{AppThemeBinding Light=#6884A5, Dark=#C8D9F0}" />
+                                </VerticalStackLayout>
+                                <Switch Grid.Column="1"
+                                        IsToggled="{Binding Store.IsDarkMode}"
+                                        OnColor="#25A9F5" />
+                            </Grid>
+                        </Border>
+                    </VerticalStackLayout>
+                </Border>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <controls:PortalBottomNav Grid.Row="1"
+                                  ActiveTab="Profile" />
+    </Grid>
+</ContentPage>

@@ -1,0 +1,201 @@
+@page "/complaints"
+@attribute [Authorize(Roles = "SuperAdmin,Admin,Porter")]
+@inject VirgoHubService Hub
+
+<PageTitle>VirgoHub Complaints</PageTitle>
+
+@if (!hasAccess)
+{
+    <section class="surface-card">
+        <div class="empty-state-vgh">
+            <strong>Access restricted</strong>
+            <span>Your portal account does not have permission to manage complaints.</span>
+        </div>
+    </section>
+}
+else
+{
+<section class="page-intro">
+    <div>
+        <div class="section-kicker">Complaints Desk</div>
+        <h2>@PageTitleText</h2>
+        <p>@PageSummaryText</p>
+    </div>
+</section>
+
+@if (!string.IsNullOrWhiteSpace(feedback))
+{
+    <div class="toast-banner @feedbackType">@feedback</div>
+}
+
+<section class="dashboard-grid">
+    <div class="surface-card">
+        <div class="surface-head">
+            <h3>Visible complaint board</h3>
+            <span>@complaints.Count entries</span>
+        </div>
+        <div class="table-shell">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Issue</th>
+                        <th>Hostel</th>
+                        <th>Status</th>
+                        <th>Scope</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in complaints)
+                    {
+                        <tr class="@(selectedComplaintId == item.Id ? "active-row" : string.Empty)">
+                            <td>@item.StudentName</td>
+                            <td>@item.Title</td>
+                            <td>@item.Hostel / @item.Room</td>
+                            <td>@item.Status</td>
+                            <td>@item.StudentGender</td>
+                            <td>
+                                <button class="ghost-button" @onclick="@(() => SelectComplaint(item.Id))">Review</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="surface-card">
+        <div class="surface-head">
+            <h3>Complaint action</h3>
+        </div>
+
+        @if (selectedComplaint is null)
+        {
+            <div class="empty-state-vgh">
+                <strong>Select a complaint</strong>
+                <span>Choose a row from the complaint board to update its status and response note.</span>
+            </div>
+        }
+        else
+        {
+            <div class="detail-stack">
+                <div class="detail-row"><strong>Student</strong><span>@selectedComplaint.StudentName</span></div>
+                <div class="detail-row"><strong>Issue</strong><span>@selectedComplaint.Title</span></div>
+                <div class="detail-row"><strong>Location</strong><span>@selectedComplaint.Hostel / @selectedComplaint.Room</span></div>
+                <div class="detail-row"><strong>Description</strong><span>@selectedComplaint.Description</span></div>
+            </div>
+
+            <div class="form-grid-vgh">
+                <label>
+                    <span>Status</span>
+                    <InputSelect @bind-Value="complaintUpdate.Status">
+                        @foreach (var status in Enum.GetValues<ComplaintStatus>())
+                        {
+                            <option value="@status">@status</option>
+                        }
+                    </InputSelect>
+                </label>
+                <label class="full-span">
+                    <span>Resolution note</span>
+                    <InputTextArea @bind-Value="complaintUpdate.ResolutionNote" />
+                </label>
+            </div>
+
+            <button class="vgh-button" @onclick="SaveComplaintAsync">Save complaint update</button>
+        }
+    </div>
+</section>
+}
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthenticationStateTask { get; set; }
+
+    private UserProfile? currentUser;
+    private List<ComplaintTicket> complaints = [];
+    private ComplaintTicket? selectedComplaint;
+    private UpdateComplaintStatusRequest complaintUpdate = new() { Status = ComplaintStatus.Pending };
+    private string selectedComplaintId = string.Empty;
+    private string feedback = string.Empty;
+    private string feedbackType = "ok";
+    private bool hasAccess;
+
+    private string PageTitleText => currentUser?.Role == UserRole.Porter
+        ? "Work through the complaint queue inside your approved hostel scope."
+        : currentUser?.Role == UserRole.Admin
+            ? "Manage the complaint queue assigned to your portal account."
+            : "Oversee the full complaint response flow without losing privacy controls.";
+
+    private string PageSummaryText => currentUser?.Role == UserRole.Porter
+        ? "VirgoHub automatically hides complaint records outside your permitted gender scope."
+        : currentUser?.Role == UserRole.Admin
+            ? "Complaint admins can review complaint records across this service area."
+            : "The super admin can review every complaint, while porter logins stay restricted to their assigned student group.";
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (AuthenticationStateTask is null)
+        {
+            return;
+        }
+
+        var authState = await AuthenticationStateTask;
+        var userId = authState.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        currentUser = string.IsNullOrWhiteSpace(userId) ? null : Hub.GetUserById(userId);
+        hasAccess = currentUser is not null && (currentUser.Role is UserRole.SuperAdmin or UserRole.Porter || Hub.CanAccessModule(currentUser.Id, AdminModule.Complaints));
+
+        if (hasAccess)
+        {
+            Reload();
+        }
+    }
+
+    private void SelectComplaint(string complaintId)
+    {
+        selectedComplaintId = complaintId;
+        selectedComplaint = complaints.FirstOrDefault(x => x.Id == complaintId);
+        if (selectedComplaint is null)
+        {
+            complaintUpdate = new UpdateComplaintStatusRequest { Status = ComplaintStatus.Pending };
+            return;
+        }
+
+        complaintUpdate = new UpdateComplaintStatusRequest
+        {
+            Status = selectedComplaint.Status,
+            ResolutionNote = selectedComplaint.ResolutionNote
+        };
+    }
+
+    private async Task SaveComplaintAsync()
+    {
+        try
+        {
+            if (currentUser is null || string.IsNullOrWhiteSpace(selectedComplaintId))
+            {
+                throw new InvalidOperationException("Select a complaint before saving an update.");
+            }
+
+            await Hub.UpdateComplaintAsync(currentUser.Id, selectedComplaintId, complaintUpdate);
+            feedback = "The complaint record has been updated successfully.";
+            feedbackType = "ok";
+            Reload();
+            SelectComplaint(selectedComplaintId);
+        }
+        catch (Exception ex)
+        {
+            feedback = ex.Message;
+            feedbackType = "error";
+        }
+    }
+
+    private void Reload()
+    {
+        complaints = currentUser is null
+            ? []
+            : Hub.GetComplaintsForOperator(currentUser.Id).ToList();
+
+        selectedComplaint = complaints.FirstOrDefault(x => x.Id == selectedComplaintId);
+    }
+}

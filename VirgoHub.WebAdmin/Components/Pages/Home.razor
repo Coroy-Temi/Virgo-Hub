@@ -1,0 +1,297 @@
+@page "/"
+@attribute [Authorize(Roles = "SuperAdmin,Admin,Porter")]
+@inject VirgoHubService Hub
+
+<PageTitle>VirgoHub Overview</PageTitle>
+
+@if (IsPorterView)
+{
+    <section class="hero-panel">
+        <div>
+            <div class="section-kicker">Porter Workspace</div>
+            <h2>Only complaints within your hostel scope appear here.</h2>
+            <p>Your desk shows only the records assigned to your complaint team.</p>
+        </div>
+        <div class="hero-accent-grid">
+            <div class="accent-chip">Scoped to @currentUser?.Gender complaints</div>
+            <div class="accent-chip">@complaints.Count visible tickets</div>
+            <div class="accent-chip">@complaints.Count(x => x.Status == ComplaintStatus.Pending) pending</div>
+            <div class="accent-chip">@complaints.Count(x => x.Status == ComplaintStatus.InProgress) in progress</div>
+        </div>
+    </section>
+
+    <section class="dashboard-grid">
+        <div class="surface-card">
+            <div class="surface-head">
+                <h3>Complaint Queue</h3>
+                <a class="ghost-link" href="/complaints">Open complaint board</a>
+            </div>
+            <div class="list-stack">
+                @foreach (var item in complaints.Take(6))
+                {
+                    <div class="list-item-vgh">
+                        <div>
+                            <strong>@item.Title</strong>
+                            <div>@item.StudentName | @item.Hostel @item.Room</div>
+                        </div>
+                        <span>@item.Status</span>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+}
+else
+{
+    <section class="hero-panel">
+        <div>
+            <div class="section-kicker">@OverviewKicker</div>
+            <h2>@OverviewTitle</h2>
+            <p>@OverviewSummary</p>
+        </div>
+        <div class="hero-accent-grid">
+            <div class="accent-chip">@(IsOperationsAdminView ? "Scoped page access" : "Single super admin")</div>
+            <div class="accent-chip">Scoped porter access</div>
+            <div class="accent-chip">Student OTP sign-in</div>
+            <div class="accent-chip">Live school records</div>
+        </div>
+    </section>
+
+    <section class="command-grid">
+        <div class="command-card">
+            <div class="command-card-kicker">Daily Brief</div>
+            <strong>@summary.PendingComplaints open complaints need attention today</strong>
+            <span>Complaint routing, hostel support, and service response remain the main live operations area.</span>
+        </div>
+        <div class="command-card">
+            <div class="command-card-kicker">Access Desk</div>
+            <strong>@summary.StudentCount active students across the current system</strong>
+            <span>Student access remains controlled by the super-admin account.</span>
+        </div>
+        <div class="command-card">
+            <div class="command-card-kicker">Service Load</div>
+            <strong>@summary.MaterialsInHub materials published and @summary.TodaysBookings bookings tracked</strong>
+            <span>Course materials and sports reservations stay visible throughout the day.</span>
+        </div>
+    </section>
+
+    <section class="metric-grid">
+        <div class="metric-card">
+            <span>Total Accounts</span>
+            <strong>@summary.TotalUsers</strong>
+            <small>All active portal and student records</small>
+        </div>
+        <div class="metric-card">
+            <span>Students</span>
+            <strong>@summary.StudentCount</strong>
+            <small>Profiles ready for mobile access</small>
+        </div>
+        <div class="metric-card">
+            <span>Porters</span>
+            <strong>@summary.PorterCount</strong>
+            <small>Scoped complaint operators</small>
+        </div>
+        <div class="metric-card">
+            <span>Open Complaints</span>
+            <strong>@summary.PendingComplaints</strong>
+            <small>Pending and in-progress support issues</small>
+        </div>
+        <div class="metric-card">
+            <span>Upcoming Events</span>
+            <strong>@summary.ActiveEvents</strong>
+            <small>Live and scheduled communications</small>
+        </div>
+        <div class="metric-card">
+            <span>Course Enrollments</span>
+            <strong>@summary.EnrolledCourses</strong>
+            <small>Student course enrollments currently tracked</small>
+        </div>
+    </section>
+
+    <section class="module-grid">
+        @if (CanSee(AdminModule.Students))
+        {
+        <a class="module-card" href="/students">
+            <div class="module-card-head">
+                <span class="module-icon">ST</span>
+                <div>
+                    <strong>Student Access</strong>
+                    <div>Profiles, onboarding, porter creation</div>
+                </div>
+            </div>
+            <div class="module-card-meta">@summary.StudentCount students ready for secure mobile login</div>
+        </a>
+        }
+        @if (CanSee(AdminModule.Events))
+        {
+        <a class="module-card" href="/events">
+            <div class="module-card-head">
+                <span class="module-icon">EV</span>
+                <div>
+                    <strong>Events</strong>
+                    <div>Chapel notices and campus announcements</div>
+                </div>
+            </div>
+            <div class="module-card-meta">@summary.ActiveEvents upcoming items in the calendar feed</div>
+        </a>
+        }
+        @if (CanSee(AdminModule.Voting))
+        {
+        <a class="module-card" href="/voting">
+            <div class="module-card-head">
+                <span class="module-icon">VT</span>
+                <div>
+                    <strong>Voting</strong>
+                    <div>Election setup and candidate windows</div>
+                </div>
+            </div>
+            <div class="module-card-meta">@summary.ActiveElections active election windows</div>
+        </a>
+        }
+        @if (CanSee(AdminModule.Sports))
+        {
+        <a class="module-card" href="/sports">
+            <div class="module-card-head">
+                <span class="module-icon">SP</span>
+                <div>
+                    <strong>Sports</strong>
+                    <div>Facilities and reservation visibility</div>
+                </div>
+            </div>
+            <div class="module-card-meta">@summary.TodaysBookings bookings scheduled for today</div>
+        </a>
+        }
+        @if (CanSee(AdminModule.Library))
+        {
+        <a class="module-card" href="/library">
+            <div class="module-card-head">
+                <span class="module-icon">LB</span>
+                <div>
+                    <strong>Library</strong>
+                    <div>Course materials and enrollments</div>
+                </div>
+            </div>
+            <div class="module-card-meta">@summary.MaterialsInHub materials published for student access</div>
+        </a>
+        }
+        @if (CanSee(AdminModule.Complaints))
+        {
+        <a class="module-card" href="/complaints">
+            <div class="module-card-head">
+                <span class="module-icon">CP</span>
+                <div>
+                    <strong>Complaints</strong>
+                    <div>Privacy-aware service response</div>
+                </div>
+            </div>
+            <div class="module-card-meta">@summary.PendingComplaints complaints currently needing action</div>
+        </a>
+        }
+    </section>
+
+    <section class="dashboard-grid">
+        <div class="surface-card">
+            <div class="surface-head">
+                <h3>Operational Priorities</h3>
+            </div>
+            <div class="bullet-stack">
+                <div class="bullet-row">
+                    <strong>Student accounts are admin-led.</strong>
+                    <span>Create the profile first, then the student signs in with school email and a one-time code.</span>
+                </div>
+                <div class="bullet-row">
+                    <strong>Porter access is limited by gender scope.</strong>
+                    <span>Complaint privacy is enforced automatically inside the same portal.</span>
+                </div>
+                <div class="bullet-row">
+                    <strong>Each service area stays organized.</strong>
+                    <span>Students, events, voting, sports, course materials, and complaints each have their own page.</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="surface-card">
+            <div class="surface-head">
+                <h3>Upcoming Calendar</h3>
+                <a class="ghost-link" href="/events">Manage events</a>
+            </div>
+            <div class="list-stack">
+                @foreach (var item in events)
+                {
+                    <div class="list-item-vgh">
+                        <div>
+                            <strong>@item.Title</strong>
+                            <div>@item.Category | @item.Venue</div>
+                        </div>
+                        <span>@item.StartsAt.LocalDateTime.ToString("dd MMM, hh:mm tt")</span>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="surface-card">
+            <div class="surface-head">
+                <h3>Newest Student Profiles</h3>
+                <a class="ghost-link" href="/students">Open student desk</a>
+            </div>
+            <div class="list-stack">
+                @foreach (var user in users)
+                {
+                    <div class="list-item-vgh">
+                        <div>
+                            <strong>@user.FullName</strong>
+                            <div>@user.Department | @user.Level</div>
+                        </div>
+                        <span>@user.Gender</span>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+}
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthenticationStateTask { get; set; }
+
+    private UserProfile? currentUser;
+    private HashSet<AdminModule> accessibleModules = [];
+    private AdminSummary summary = new();
+    private List<CampusEvent> events = [];
+    private List<UserProfile> users = [];
+    private List<ComplaintTicket> complaints = [];
+
+    private bool IsPorterView => currentUser?.Role == UserRole.Porter;
+    private bool IsOperationsAdminView => currentUser?.Role == UserRole.Admin;
+    private bool CanSee(AdminModule module) => currentUser?.Role == UserRole.SuperAdmin || accessibleModules.Contains(module);
+    private string OverviewKicker => IsOperationsAdminView ? "Operations Admin Overview" : "Super Admin Overview";
+    private string OverviewTitle => IsOperationsAdminView
+        ? "Manage the service areas assigned to your portal account."
+        : "Oversee student access, services, and campus records from one portal.";
+    private string OverviewSummary => IsOperationsAdminView
+        ? "Your account opens only the pages assigned by the super admin."
+        : "Students, events, voting, sports, complaints, and course materials stay under one super-admin account.";
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (AuthenticationStateTask is null)
+        {
+            return;
+        }
+
+        var authState = await AuthenticationStateTask;
+        var userId = authState.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        currentUser = string.IsNullOrWhiteSpace(userId) ? null : Hub.GetUserById(userId);
+        accessibleModules = Hub.GetAccessibleModules(currentUser).ToHashSet();
+
+        if (currentUser?.Role == UserRole.Porter)
+        {
+            complaints = Hub.GetComplaintsForOperator(currentUser.Id).ToList();
+            return;
+        }
+
+        summary = Hub.GetSummary(currentUser?.Id);
+        events = Hub.GetEvents(currentUser?.Id).Take(5).ToList();
+        users = Hub.GetUsers(currentUser?.Id).Where(x => x.Role == UserRole.Student).Take(5).ToList();
+    }
+}

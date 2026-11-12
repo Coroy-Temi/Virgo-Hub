@@ -1,0 +1,18 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="vhBg" x1="64" y1="52" x2="450" y2="470" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1D74FF"/>
+      <stop offset="1" stop-color="#0A2B73"/>
+    </linearGradient>
+    <linearGradient id="vhGlow" x1="132" y1="96" x2="404" y2="392" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#8FD0FF" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect x="40" y="40" width="432" height="432" rx="124" fill="url(#vhBg)"/>
+  <circle cx="162" cy="130" r="118" fill="url(#vhGlow)"/>
+  <path d="M118 148L184 348L250 148" stroke="white" stroke-width="44" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M286 144V364" stroke="white" stroke-width="44" stroke-linecap="round"/>
+  <path d="M394 144V364" stroke="white" stroke-width="44" stroke-linecap="round"/>
+  <path d="M286 248H394" stroke="white" stroke-width="44" stroke-linecap="round"/>
+</svg>

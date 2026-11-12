@@ -1,0 +1,25 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="vhBg" x1="84" y1="64" x2="426" y2="444" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#4CB8FF"/>
+      <stop offset="0.52" stop-color="#1D74FF"/>
+      <stop offset="1" stop-color="#0A2B73"/>
+    </linearGradient>
+    <linearGradient id="vhSheen" x1="122" y1="94" x2="320" y2="248" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF" stop-opacity="0.78"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="vhStroke" x1="116" y1="116" x2="380" y2="380" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#D7E8FF"/>
+    </linearGradient>
+  </defs>
+  <rect x="48" y="48" width="416" height="416" rx="116" fill="url(#vhBg)"/>
+  <rect x="60" y="60" width="392" height="392" rx="104" stroke="#8CC8FF" stroke-opacity="0.22" stroke-width="2"/>
+  <path d="M104 78C146 54 200 52 248 74C286 92 302 124 274 150C245 177 184 176 154 202C116 236 122 304 88 346C72 366 55 380 44 388V164C44 126 64 98 104 78Z" fill="url(#vhSheen)"/>
+  <circle cx="362" cy="366" r="74" fill="#061D55" fill-opacity="0.16"/>
+  <path d="M156 164L214 324L272 164" stroke="url(#vhStroke)" stroke-width="32" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M314 174V338" stroke="url(#vhStroke)" stroke-width="30" stroke-linecap="round"/>
+  <path d="M380 174V338" stroke="url(#vhStroke)" stroke-width="30" stroke-linecap="round"/>
+  <path d="M314 254H380" stroke="url(#vhStroke)" stroke-width="30" stroke-linecap="round"/>
+</svg>

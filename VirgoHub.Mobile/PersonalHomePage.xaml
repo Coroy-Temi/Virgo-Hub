@@ -1,0 +1,364 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="VirgoHub.Mobile.PersonalHomePage"
+             Title="VirgoHub Personal"
+             NavigationPage.HasNavigationBar="False"
+             BackgroundColor="{AppThemeBinding Light=#F5FAFF, Dark=#07172C}">
+    <Grid>
+        <ScrollView>
+            <VerticalStackLayout Padding="20,20,20,28"
+                                 Spacing="18">
+                <Grid ColumnDefinitions="*,Auto"
+                      ColumnSpacing="12">
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="{Binding Store.CurrentTenantName}"
+                               FontSize="13"
+                               FontAttributes="Bold"
+                               TextColor="#25A9F5" />
+                        <Label Text="{Binding GreetingTitle}"
+                               FontSize="30"
+                               FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light=#0B213F, Dark=White}" />
+                        <Label Text="{Binding PersonalReference}"
+                               FontSize="13"
+                               TextColor="{AppThemeBinding Light=#6C86A8, Dark=#C3D7F2}" />
+                    </VerticalStackLayout>
+
+                    <Border Grid.Column="1"
+                            WidthRequest="56"
+                            HeightRequest="56"
+                            BackgroundColor="{AppThemeBinding Light=#EAF6FF, Dark=#17355F}"
+                            Stroke="{Binding ProfileHighlightStroke}"
+                            StrokeThickness="{Binding ProfileHighlightStrokeThickness}">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="20" />
+                        </Border.StrokeShape>
+                        <Image Source="icon_profile.svg"
+                               HeightRequest="24"
+                               WidthRequest="24"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center" />
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnProfileClicked" />
+                        </Border.GestureRecognizers>
+                    </Border>
+                </Grid>
+
+                <Border Padding="22"
+                        BackgroundColor="{AppThemeBinding Light=White, Dark=#102542}"
+                        Stroke="{Binding HeroHighlightStroke}"
+                        StrokeThickness="{Binding HeroHighlightStrokeThickness}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="32" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout Spacing="14">
+                        <Label Text="Personal Learning Space"
+                               FontSize="24"
+                               FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light=#0B213F, Dark=White}" />
+                        <Label Text="A calmer VirgoHub flow for lecturer-led groups, shared materials, study reminders, and personal learning activity."
+                               FontSize="14"
+                               LineBreakMode="WordWrap"
+                               TextColor="{AppThemeBinding Light=#6C86A8, Dark=#C3D7F2}" />
+
+                        <Grid ColumnDefinitions="*,*"
+                              ColumnSpacing="10">
+                            <Border Grid.Column="0"
+                                    Padding="14"
+                                    BackgroundColor="{AppThemeBinding Light=#F4FAFF, Dark=#0B2249}"
+                                    StrokeThickness="0">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="20" />
+                                </Border.StrokeShape>
+                                <VerticalStackLayout Spacing="4">
+                                    <Label Text="Materials"
+                                           FontAttributes="Bold"
+                                           TextColor="{AppThemeBinding Light=#0B213F, Dark=White}" />
+                                    <Label Text="{Binding MaterialStatus}"
+                                           FontSize="13"
+                                           TextColor="{AppThemeBinding Light=#6C86A8, Dark=#C3D7F2}" />
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <Border Grid.Column="1"
+                                    Padding="14"
+                                    BackgroundColor="{AppThemeBinding Light=#F4FAFF, Dark=#0B2249}"
+                                    StrokeThickness="0">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="20" />
+                                </Border.StrokeShape>
+                                <VerticalStackLayout Spacing="4">
+                                    <Label Text="Teaching Groups"
+                                           FontAttributes="Bold"
+                                           TextColor="{AppThemeBinding Light=#0B213F, Dark=White}" />
+                                    <Label Text="{Binding GroupStatus}"
+                                           FontSize="13"
+                                           TextColor="{AppThemeBinding Light=#6C86A8, Dark=#C3D7F2}" />
+                                </VerticalStackLayout>
+                            </Border>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Grid ColumnDefinitions="*,*"
+                      ColumnSpacing="12"
+                      RowDefinitions="Auto,Auto"
+                      RowSpacing="12">
+                    <Border Grid.Row="0"
+                            Grid.Column="0"
+                            Padding="18"
+                            BackgroundColor="{AppThemeBinding Light=White, Dark=#102542}"
+                            Stroke="{Binding GroupsHighlightStroke}"
+                            StrokeThickness="{Binding GroupsHighlightStrokeThickness}">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="24" />
+                        </Border.StrokeShape>
+                        <VerticalStackLayout Spacing="10">
+                            <Image Source="icon_results.svg"
+                                   HeightRequest="28"
+                                   WidthRequest="28" />
+                            <Label Text="Groups"
+                                   FontSize="18"
+                                   FontAttributes="Bold"
+                                   TextColor="{AppThemeBinding Light=#0B213F, Dark=White}" />
+                            <Label Text="Create teaching spaces, share join codes, and keep lecturer-led cohorts tidy."
+                                   FontSize="13"
+                                   TextColor="{AppThemeBinding Light=#6C86A8, Dark=#C3D7F2}" />
+                        </VerticalStackLayout>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnGroupsClicked" />
+                        </Border.GestureRecognizers>
+                    </Border>
+
+                    <Border Grid.Row="0"
+                            Grid.Column="1"
+                            Padding="18"
+                            BackgroundColor="{AppThemeBinding Light=White, Dark=#102542}"
+                            Stroke="{Binding MaterialsHighlightStroke}"
+                            StrokeThickness="{Binding MaterialsHighlightStrokeThickness}">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="24" />
+                        </Border.StrokeShape>
+                        <VerticalStackLayout Spacing="10">
+                            <Image Source="icon_library.svg"
+                                   HeightRequest="28"
+                                   WidthRequest="28" />
+                            <Label Text="Materials"
+                                   FontSize="18"
+                                   FontAttributes="Bold"
+                                   TextColor="{AppThemeBinding Light=#0B213F, Dark=White}" />
+                            <Label Text="Open shared materials, outlines, and study resources in one organized space."
+                                   FontSize="13"
+                                   TextColor="{AppThemeBinding Light=#6C86A8, Dark=#C3D7F2}" />
+                        </VerticalStackLayout>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnMaterialsClicked" />
+                        </Border.GestureRecognizers>
+                    </Border>
+
+                    <Border Grid.Row="1"
+                            Grid.Column="0"
+                            Padding="18"
+                            BackgroundColor="{AppThemeBinding Light=White, Dark=#102542}"
+                            Stroke="{Binding AlertsHighlightStroke}"
+                            StrokeThickness="{Binding AlertsHighlightStrokeThickness}">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="24" />
+                        </Border.StrokeShape>
+                        <VerticalStackLayout Spacing="10">
+                            <Image Source="icon_notifications.svg"
+                                   HeightRequest="28"
+                                   WidthRequest="28" />
+                            <Label Text="Alerts"
+                                   FontSize="18"
+                                   FontAttributes="Bold"
+                                   TextColor="{AppThemeBinding Light=#0B213F, Dark=White}" />
+                            <Label Text="Tune reminders, material updates, and lecturer activity alerts."
+                                   FontSize="13"
+                                   TextColor="{AppThemeBinding Light=#6C86A8, Dark=#C3D7F2}" />
+                        </VerticalStackLayout>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnNotificationsClicked" />
+                        </Border.GestureRecognizers>
+                    </Border>
+
+                    <Border Grid.Row="1"
+                            Grid.Column="1"
+                            Padding="18"
+                            BackgroundColor="{AppThemeBinding Light=White, Dark=#102542}"
+                            Stroke="{Binding PlansHighlightStroke}"
+                            StrokeThickness="{Binding PlansHighlightStrokeThickness}">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="24" />
+                        </Border.StrokeShape>
+                        <VerticalStackLayout Spacing="10">
+                            <Image Source="icon_events.svg"
+                                   HeightRequest="28"
+                                   WidthRequest="28" />
+                            <Label Text="Plans"
+                                   FontSize="18"
+                                   FontAttributes="Bold"
+                                   TextColor="{AppThemeBinding Light=#0B213F, Dark=White}" />
+                            <Label Text="Keep tests, study sessions, and tutoring reminders visible."
+                                   FontSize="13"
+                                   TextColor="{AppThemeBinding Light=#6C86A8, Dark=#C3D7F2}" />
+                        </VerticalStackLayout>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnEventsClicked" />
+                        </Border.GestureRecognizers>
+                    </Border>
+                </Grid>
+
+                <Border Padding="18"
+                        BackgroundColor="{AppThemeBinding Light=White, Dark=#102542}"
+                        Stroke="{AppThemeBinding Light=#DCEEFF, Dark=#1A3B70}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="24" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout Spacing="12">
+                        <Grid ColumnDefinitions="*,Auto"
+                              ColumnSpacing="12">
+                            <Label Text="Recent Notifications"
+                                   FontSize="20"
+                                   FontAttributes="Bold"
+                                   TextColor="{AppThemeBinding Light=#0B213F, Dark=White}" />
+                            <Button Grid.Column="1"
+                                    Text="Open"
+                                    Padding="16,8"
+                                    BackgroundColor="{AppThemeBinding Light=#EAF4FF, Dark=#173E71}"
+                                    TextColor="{AppThemeBinding Light=#0B213F, Dark=White}"
+                                    Clicked="OnNotificationsClicked" />
+                        </Grid>
+                        <CollectionView ItemsSource="{Binding Store.Notifications}"
+                                        HeightRequest="190"
+                                        EmptyView="Personal notifications will appear here once your materials, groups, and reminders begin to move.">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <VerticalStackLayout Spacing="4"
+                                                         Padding="0,8">
+                                        <Label Text="{Binding Title}"
+                                               FontAttributes="Bold"
+                                               TextColor="{AppThemeBinding Light=#0B213F, Dark=White}" />
+                                        <Label Text="{Binding Message}"
+                                               FontSize="13"
+                                               LineBreakMode="WordWrap"
+                                               TextColor="{AppThemeBinding Light=#6C86A8, Dark=#C3D7F2}" />
+                                    </VerticalStackLayout>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Padding="18"
+                        BackgroundColor="{AppThemeBinding Light=White, Dark=#102542}"
+                        Stroke="{AppThemeBinding Light=#DCEEFF, Dark=#1A3B70}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="24" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout Spacing="12">
+                        <Grid ColumnDefinitions="*,Auto"
+                              ColumnSpacing="12">
+                            <Label Text="Recent Activity"
+                                   FontSize="20"
+                                   FontAttributes="Bold"
+                                   TextColor="{AppThemeBinding Light=#0B213F, Dark=White}" />
+                            <Button Grid.Column="1"
+                                    Text="Refresh"
+                                    Padding="16,8"
+                                    BackgroundColor="#25A9F5"
+                                    TextColor="White"
+                                    Clicked="OnRefreshClicked" />
+                        </Grid>
+                        <CollectionView ItemsSource="{Binding Store.RecentActivities}"
+                                        EmptyView="Your personal workspace activity will appear here as your groups and materials grow.">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <VerticalStackLayout Spacing="3"
+                                                         Padding="0,8">
+                                        <Label Text="{Binding Title}"
+                                               FontAttributes="Bold"
+                                               TextColor="{AppThemeBinding Light=#0B213F, Dark=White}" />
+                                        <Label Text="{Binding Description}"
+                                               FontSize="13"
+                                               TextColor="{AppThemeBinding Light=#6C86A8, Dark=#C3D7F2}" />
+                                    </VerticalStackLayout>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </VerticalStackLayout>
+                </Border>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <Grid IsVisible="{Binding ShowTutorial}"
+              BackgroundColor="#7006172C">
+            <VerticalStackLayout VerticalOptions="End"
+                                 Padding="18,18,18,28"
+                                 Spacing="14">
+                <Border Padding="22"
+                        BackgroundColor="{AppThemeBinding Light=White, Dark=#102542}"
+                        Stroke="{AppThemeBinding Light=#DCEEFF, Dark=#1A3B70}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="28" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout Spacing="14">
+                        <Label Text="{Binding TutorialStepLabel}"
+                               FontSize="12"
+                               FontAttributes="Bold"
+                               TextColor="#25A9F5" />
+                        <Label Text="{Binding TutorialTitle}"
+                               FontSize="24"
+                               FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light=#0B213F, Dark=White}" />
+                        <Label Text="{Binding TutorialMessage}"
+                               FontSize="14"
+                               LineBreakMode="WordWrap"
+                               TextColor="{AppThemeBinding Light=#6C86A8, Dark=#C3D7F2}" />
+                        <Border Padding="14"
+                                BackgroundColor="{AppThemeBinding Light=#F4FAFF, Dark=#0B2249}"
+                                StrokeThickness="0">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="18" />
+                            </Border.StrokeShape>
+                            <VerticalStackLayout Spacing="4">
+                                <Label Text="{Binding TutorialDirectionTitle}"
+                                       FontSize="12"
+                                       FontAttributes="Bold"
+                                       TextColor="#25A9F5" />
+                                <Label Text="{Binding TutorialDirectionHint}"
+                                       FontSize="13"
+                                       LineBreakMode="WordWrap"
+                                       TextColor="{AppThemeBinding Light=#0B213F, Dark=White}" />
+                            </VerticalStackLayout>
+                        </Border>
+                        <Grid ColumnDefinitions="Auto,*"
+                              ColumnSpacing="10">
+                            <Button Text="Skip"
+                                    Padding="18,10"
+                                    CornerRadius="20"
+                                    BackgroundColor="{AppThemeBinding Light=#EAF4FF, Dark=#173E71}"
+                                    TextColor="{AppThemeBinding Light=#0B213F, Dark=White}"
+                                    Clicked="OnTutorialSkipClicked" />
+                            <Button Grid.Column="1"
+                                    IsVisible="{Binding ShowTutorialPrimaryAction}"
+                                    Text="{Binding TutorialPrimaryActionLabel}"
+                                    Padding="18,10"
+                                    CornerRadius="20"
+                                    BackgroundColor="{AppThemeBinding Light=#DCEEFF, Dark=#173E71}"
+                                    TextColor="{AppThemeBinding Light=#0B213F, Dark=White}"
+                                    Clicked="OnTutorialPrimaryActionClicked" />
+                        </Grid>
+                        <Button Text="{Binding TutorialNextButtonLabel}"
+                                Padding="18,10"
+                                CornerRadius="20"
+                                BackgroundColor="#25A9F5"
+                                TextColor="White"
+                                Clicked="OnTutorialNextClicked" />
+                    </VerticalStackLayout>
+                </Border>
+            </VerticalStackLayout>
+        </Grid>
+    </Grid>
+</ContentPage>

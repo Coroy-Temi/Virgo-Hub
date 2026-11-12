@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:VirgoHub.Mobile.Controls"
+             x:Class="VirgoHub.Mobile.PersonalProfilePage"
+             Title="Profile"
+             NavigationPage.HasNavigationBar="False"
+             BackgroundColor="{AppThemeBinding Light=#EFF7FF, Dark=#07172C}">
+    <Grid RowDefinitions="*,Auto">
+        <ScrollView Grid.Row="0">
+            <VerticalStackLayout Padding="20,18,20,24"
+                                 Spacing="18">
+                <Border Padding="22"
+                        BackgroundColor="{AppThemeBinding Light=White, Dark=#102542}"
+                        Stroke="{AppThemeBinding Light=#DCEEFF, Dark=#1A3B70}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="30" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout Spacing="16">
+                        <Grid ColumnDefinitions="Auto,*"
+                              ColumnSpacing="14">
+                            <Border WidthRequest="72"
+                                    HeightRequest="72"
+                                    BackgroundColor="{AppThemeBinding Light=#EAF6FF, Dark=#17355F}"
+                                    StrokeThickness="0">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="26" />
+                                </Border.StrokeShape>
+                                <Image Source="icon_profile.svg"
+                                       HeightRequest="30"
+                                       WidthRequest="30"
+                                       HorizontalOptions="Center"
+                                       VerticalOptions="Center" />
+                            </Border>
+                            <VerticalStackLayout Grid.Column="1"
+                                                 Spacing="4"
+                                                 VerticalOptions="Center">
+                                <Label Text="{Binding Store.CurrentUserName}"
+                                       FontSize="26"
+                                       FontAttributes="Bold"
+                                       TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                                <Label Text="{Binding PersonalRoleLabel}"
+                                       FontSize="13"
+                                       FontAttributes="Bold"
+                                       TextColor="#25A9F5" />
+                                <Label Text="{Binding Store.CurrentUserHostel}"
+                                       FontSize="13"
+                                       TextColor="{AppThemeBinding Light=#6884A5, Dark=#C8D9F0}" />
+                            </VerticalStackLayout>
+                        </Grid>
+
+                        <Border Padding="14"
+                                BackgroundColor="{AppThemeBinding Light=#F7FBFF, Dark=#0B2249}"
+                                StrokeThickness="0">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="20" />
+                            </Border.StrokeShape>
+                            <VerticalStackLayout Spacing="4">
+                                <Label Text="{Binding Store.CurrentTenantName}"
+                                       FontAttributes="Bold"
+                                       TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                                <Label Text="{Binding Store.CurrentProfileSummary}"
+                                       FontSize="13"
+                                       TextColor="{AppThemeBinding Light=#6884A5, Dark=#C8D9F0}" />
+                                <Label Text="{Binding Store.SupportSummary}"
+                                       FontSize="12"
+                                       TextColor="{AppThemeBinding Light=#6884A5, Dark=#C8D9F0}" />
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <Grid ColumnDefinitions="*,*"
+                              ColumnSpacing="10">
+                            <Border Grid.Column="0"
+                                    Padding="14"
+                                    BackgroundColor="{AppThemeBinding Light=#F4FAFF, Dark=#0B2249}"
+                                    StrokeThickness="0">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="20" />
+                                </Border.StrokeShape>
+                                <VerticalStackLayout Spacing="4">
+                                    <Label Text="Groups"
+                                           FontAttributes="Bold"
+                                           TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                                    <Label Text="{Binding Store.PersonalGroupSummary}"
+                                           FontSize="13"
+                                           TextColor="{AppThemeBinding Light=#6884A5, Dark=#C8D9F0}" />
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <Border Grid.Column="1"
+                                    Padding="14"
+                                    BackgroundColor="{AppThemeBinding Light=#F4FAFF, Dark=#0B2249}"
+                                    StrokeThickness="0">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="20" />
+                                </Border.StrokeShape>
+                                <VerticalStackLayout Spacing="4">
+                                    <Label Text="Alerts"
+                                           FontAttributes="Bold"
+                                           TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                                    <Label Text="{Binding NotificationSummary}"
+                                           FontSize="13"
+                                           TextColor="{AppThemeBinding Light=#6884A5, Dark=#C8D9F0}" />
+                                </VerticalStackLayout>
+                            </Border>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Padding="18"
+                        BackgroundColor="{AppThemeBinding Light=White, Dark=#102542}"
+                        Stroke="{AppThemeBinding Light=#DCEEFF, Dark=#1A3B70}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="28" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout Spacing="18">
+                        <Grid ColumnDefinitions="Auto,*,Auto"
+                              ColumnSpacing="16">
+                            <Image Source="icon_notifications.svg"
+                                   HeightRequest="34"
+                                   WidthRequest="34"
+                                   VerticalOptions="Center" />
+                            <VerticalStackLayout Grid.Column="1"
+                                                 Spacing="2">
+                                <Label Text="Notifications"
+                                       FontSize="22"
+                                       FontAttributes="Bold"
+                                       TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                                <Label Text="Course updates, teaching activity, reminders, and delivered alerts."
+                                       FontSize="12"
+                                       TextColor="{AppThemeBinding Light=#6884A5, Dark=#C8D9F0}" />
+                            </VerticalStackLayout>
+                            <Label Grid.Column="2"
+                                   Text="Open"
+                                   FontSize="13"
+                                   FontAttributes="Bold"
+                                   Padding="12,8"
+                                   VerticalTextAlignment="Center"
+                                   TextColor="#25A9F5" />
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnNotificationsTapped" />
+                            </Grid.GestureRecognizers>
+                        </Grid>
+
+                        <Grid ColumnDefinitions="Auto,*,Auto"
+                              ColumnSpacing="16">
+                            <Image Source="icon_security.svg"
+                                   HeightRequest="34"
+                                   WidthRequest="34"
+                                   VerticalOptions="Center" />
+                            <VerticalStackLayout Grid.Column="1"
+                                                 Spacing="2">
+                                <Label Text="Settings"
+                                       FontSize="22"
+                                       FontAttributes="Bold"
+                                       TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                                <Label Text="Theme, sign-in protection, and personal workspace preferences."
+                                       FontSize="12"
+                                       TextColor="{AppThemeBinding Light=#6884A5, Dark=#C8D9F0}" />
+                            </VerticalStackLayout>
+                            <Label Grid.Column="2"
+                                   Text="Open"
+                                   FontSize="13"
+                                   FontAttributes="Bold"
+                                   Padding="12,8"
+                                   VerticalTextAlignment="Center"
+                                   TextColor="#25A9F5" />
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnSettingsTapped" />
+                            </Grid.GestureRecognizers>
+                        </Grid>
+
+                        <Grid ColumnDefinitions="Auto,*,Auto"
+                              ColumnSpacing="16">
+                            <Image Source="icon_support.svg"
+                                   HeightRequest="34"
+                                   WidthRequest="34"
+                                   VerticalOptions="Center" />
+                            <VerticalStackLayout Grid.Column="1"
+                                                 Spacing="2">
+                                <Label Text="Help &amp; Support"
+                                       FontSize="22"
+                                       FontAttributes="Bold"
+                                       TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                                <Label Text="Guidance for tutors, learners, groups, and assessment flow."
+                                       FontSize="12"
+                                       TextColor="{AppThemeBinding Light=#6884A5, Dark=#C8D9F0}" />
+                            </VerticalStackLayout>
+                            <Label Grid.Column="2"
+                                   Text="Open"
+                                   FontSize="13"
+                                   FontAttributes="Bold"
+                                   Padding="12,8"
+                                   VerticalTextAlignment="Center"
+                                   TextColor="#25A9F5" />
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnSupportTapped" />
+                            </Grid.GestureRecognizers>
+                        </Grid>
+
+                        <Grid ColumnDefinitions="Auto,*,Auto"
+                              ColumnSpacing="16">
+                            <Image Source="icon_logout.svg"
+                                   HeightRequest="34"
+                                   WidthRequest="34"
+                                   VerticalOptions="Center" />
+                            <VerticalStackLayout Grid.Column="1"
+                                                 Spacing="2">
+                                <Label Text="Log Out"
+                                       FontSize="22"
+                                       FontAttributes="Bold"
+                                       TextColor="#E24A43" />
+                                <Label Text="End this personal workspace session on the device."
+                                       FontSize="12"
+                                       TextColor="{AppThemeBinding Light=#6884A5, Dark=#C8D9F0}" />
+                            </VerticalStackLayout>
+                            <Label Grid.Column="2"
+                                   Text="Leave"
+                                   FontSize="13"
+                                   FontAttributes="Bold"
+                                   Padding="12,8"
+                                   VerticalTextAlignment="Center"
+                                   TextColor="#E24A43" />
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnLogoutTapped" />
+                            </Grid.GestureRecognizers>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <controls:PortalBottomNav Grid.Row="1"
+                                  ActiveTab="Profile" />
+    </Grid>
+</ContentPage>

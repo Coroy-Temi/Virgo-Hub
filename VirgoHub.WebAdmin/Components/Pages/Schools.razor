@@ -1,0 +1,217 @@
+@page "/schools"
+@attribute [Authorize(Roles = "PlatformSuperAdmin")]
+@inject VirgoHubService Hub
+
+<PageTitle>VirgoHub Schools</PageTitle>
+
+<section class="page-intro">
+    <div>
+        <div class="section-kicker">Platform Schools</div>
+        <h2>Create schools, assign their first super admin, and keep each workspace isolated.</h2>
+        <p>Every school gets its own domain rules, super admin, and tenant boundary before its local operations portal ever opens.</p>
+    </div>
+</section>
+
+@if (!string.IsNullOrWhiteSpace(feedback))
+{
+    <div class="toast-banner @feedbackType">@feedback</div>
+}
+
+<section class="dashboard-grid">
+    <div class="surface-card">
+        <div class="surface-head">
+            <h3>Create school workspace</h3>
+        </div>
+        <div class="form-grid-vgh">
+            <label><span>School name</span><InputText @bind-Value="schoolRequest.SchoolName" /></label>
+            <label><span>Primary domain</span><InputText @bind-Value="schoolRequest.PrimaryDomain" /></label>
+            <label><span>Accent color</span><InputText @bind-Value="schoolRequest.AccentColor" /></label>
+            <label><span>Super admin name</span><InputText @bind-Value="schoolRequest.SuperAdminName" /></label>
+            <label><span>Super admin email</span><InputText @bind-Value="schoolRequest.SuperAdminEmail" /></label>
+            <label><span>Portal password</span><InputText @bind-Value="schoolRequest.SuperAdminPassword" type="password" /></label>
+            <label class="full-span"><span>Additional domains</span><InputTextArea @bind-Value="schoolRequest.AdditionalDomainsText" placeholder="Optional domains separated by commas or new lines." /></label>
+            <label class="full-span"><span>Description</span><InputTextArea @bind-Value="schoolRequest.Description" /></label>
+        </div>
+        <button class="vgh-button" @onclick="CreateSchoolAsync">Create school workspace</button>
+    </div>
+
+    <div class="surface-card">
+        <div class="surface-head">
+            <h3>Edit school workspace</h3>
+        </div>
+        <div class="form-grid-vgh">
+            <label class="full-span">
+                <span>Select school</span>
+                <InputSelect @bind-Value="selectedTenantId">
+                    <option value="">Choose a school</option>
+                    @foreach (var item in schools)
+                    {
+                        <option value="@item.Id">@item.Name - @item.PrimaryDomain</option>
+                    }
+                </InputSelect>
+            </label>
+        </div>
+        <div style="margin-top: 0.9rem; display: flex; gap: 0.75rem; flex-wrap: wrap;">
+            <button class="vgh-button alt" @onclick="LoadEditor">Load school</button>
+            @if (selectedSchool is not null)
+            {
+                <button class="vgh-button" @onclick="UpdateSchoolAsync">Save changes</button>
+            }
+        </div>
+
+        @if (selectedSchool is not null)
+        {
+            <div class="form-grid-vgh" style="margin-top: 1rem;">
+                <label><span>School name</span><InputText @bind-Value="editor.SchoolName" /></label>
+                <label><span>Primary domain</span><InputText @bind-Value="editor.PrimaryDomain" /></label>
+                <label><span>Accent color</span><InputText @bind-Value="editor.AccentColor" /></label>
+                <label>
+                    <span>Status</span>
+                    <InputSelect @bind-Value="editor.IsActive">
+                        <option value="true">Active</option>
+                        <option value="false">Inactive</option>
+                    </InputSelect>
+                </label>
+                <label class="full-span"><span>Additional domains</span><InputTextArea @bind-Value="editor.AdditionalDomainsText" /></label>
+                <label class="full-span"><span>Description</span><InputTextArea @bind-Value="editor.Description" /></label>
+            </div>
+        }
+    </div>
+</section>
+
+<section class="surface-card">
+    <div class="surface-head">
+        <h3>School directory</h3>
+        <span>@schools.Count schools</span>
+    </div>
+    <div class="table-shell">
+        <table>
+            <thead>
+                <tr>
+                    <th>School</th>
+                    <th>Primary domain</th>
+                    <th>Allowed domains</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in schools)
+                {
+                    <tr>
+                        <td>
+                            <strong>@item.Name</strong>
+                            <div>@item.Description</div>
+                        </td>
+                        <td>@item.PrimaryDomain</td>
+                        <td>@string.Join(", ", item.AllowedDomains)</td>
+                        <td>@(item.IsActive ? "Active" : "Inactive")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</section>
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthenticationStateTask { get; set; }
+
+    private UserProfile? currentUser;
+    private CreateSchoolTenantRequest schoolRequest = new()
+    {
+        AccentColor = "#25A9F5",
+        SuperAdminPassword = "VirgoHub@2026"
+    };
+    private UpdateSchoolTenantRequest editor = new() { AccentColor = "#25A9F5", IsActive = true };
+    private List<TenantProfile> schools = [];
+    private TenantProfile? selectedSchool;
+    private string selectedTenantId = string.Empty;
+    private string feedback = string.Empty;
+    private string feedbackType = "ok";
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (AuthenticationStateTask is not null)
+        {
+            var authState = await AuthenticationStateTask;
+            var userId = authState.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            currentUser = string.IsNullOrWhiteSpace(userId) ? null : Hub.GetUserById(userId);
+        }
+
+        Reload();
+    }
+
+    private async Task CreateSchoolAsync()
+    {
+        try
+        {
+            if (currentUser is null)
+            {
+                throw new InvalidOperationException("Platform admin session not found.");
+            }
+
+            await Hub.CreateSchoolTenantAsync(currentUser.Id, schoolRequest);
+            feedback = "School workspace created successfully.";
+            feedbackType = "ok";
+            schoolRequest = new CreateSchoolTenantRequest
+            {
+                AccentColor = "#25A9F5",
+                SuperAdminPassword = "VirgoHub@2026"
+            };
+            Reload();
+        }
+        catch (Exception ex)
+        {
+            feedback = ex.Message;
+            feedbackType = "error";
+        }
+    }
+
+    private void LoadEditor()
+    {
+        selectedSchool = schools.FirstOrDefault(x => x.Id == selectedTenantId);
+        if (selectedSchool is null)
+        {
+            feedback = "Select a school first.";
+            feedbackType = "error";
+            return;
+        }
+
+        editor = new UpdateSchoolTenantRequest
+        {
+            SchoolName = selectedSchool.Name,
+            PrimaryDomain = selectedSchool.PrimaryDomain,
+            AdditionalDomainsText = string.Join(", ", selectedSchool.AllowedDomains.Where(x => !x.Equals(selectedSchool.PrimaryDomain, StringComparison.OrdinalIgnoreCase))),
+            Description = selectedSchool.Description,
+            AccentColor = selectedSchool.AccentColor,
+            IsActive = selectedSchool.IsActive
+        };
+    }
+
+    private async Task UpdateSchoolAsync()
+    {
+        try
+        {
+            if (currentUser is null || selectedSchool is null)
+            {
+                throw new InvalidOperationException("Load a school first.");
+            }
+
+            await Hub.UpdateSchoolTenantAsync(currentUser.Id, selectedSchool.Id, editor);
+            feedback = "School workspace updated successfully.";
+            feedbackType = "ok";
+            Reload();
+            LoadEditor();
+        }
+        catch (Exception ex)
+        {
+            feedback = ex.Message;
+            feedbackType = "error";
+        }
+    }
+
+    private void Reload()
+    {
+        schools = Hub.GetSchoolTenants().ToList();
+    }
+}

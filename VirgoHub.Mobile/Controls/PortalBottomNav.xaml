@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="VirgoHub.Mobile.Controls.PortalBottomNav">
+    <Border Margin="16,0,16,18"
+            Padding="8,8"
+            BackgroundColor="{AppThemeBinding Light=White, Dark=#102542}"
+            Stroke="{AppThemeBinding Light=#E0EDF9, Dark=#1C3E71}"
+            StrokeThickness="1">
+        <Border.StrokeShape>
+            <RoundRectangle CornerRadius="26" />
+        </Border.StrokeShape>
+        <Grid ColumnDefinitions="*,*,*,*,*"
+              ColumnSpacing="8">
+            <Border x:Name="HomeShell"
+                    Grid.Column="0"
+                    Padding="8,8"
+                    StrokeThickness="0">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="20" />
+                </Border.StrokeShape>
+                <VerticalStackLayout HorizontalOptions="Center"
+                                     Spacing="4">
+                    <Image x:Name="HomeIcon"
+                           Source="virgohub_vh_logo.svg"
+                           HeightRequest="18"
+                           WidthRequest="18" />
+                    <Label x:Name="HomeLabel"
+                           Text="Home"
+                           FontSize="11"
+                           MaxLines="1"
+                           LineBreakMode="NoWrap"
+                           HorizontalTextAlignment="Center" />
+                </VerticalStackLayout>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnHomeTapped" />
+                </Border.GestureRecognizers>
+            </Border>
+
+            <Border x:Name="EventsShell"
+                    Grid.Column="1"
+                    Padding="8,8"
+                    StrokeThickness="0">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="20" />
+                </Border.StrokeShape>
+                <VerticalStackLayout HorizontalOptions="Center"
+                                     Spacing="4">
+                    <Image x:Name="EventsIcon"
+                           Source="icon_events.svg"
+                           HeightRequest="18"
+                           WidthRequest="18" />
+                    <Label x:Name="EventsLabel"
+                           Text="Events"
+                           FontSize="11"
+                           MaxLines="1"
+                           LineBreakMode="NoWrap"
+                           HorizontalTextAlignment="Center" />
+                </VerticalStackLayout>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnEventsTapped" />
+                </Border.GestureRecognizers>
+            </Border>
+
+            <Border x:Name="VotingShell"
+                    Grid.Column="2"
+                    Padding="8,8"
+                    StrokeThickness="0">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="20" />
+                </Border.StrokeShape>
+                <VerticalStackLayout HorizontalOptions="Center"
+                                     Spacing="4">
+                    <Image x:Name="VotingIcon"
+                           Source="icon_voting.svg"
+                           HeightRequest="18"
+                           WidthRequest="18" />
+                    <Label x:Name="VotingLabel"
+                           Text="Voting"
+                           FontSize="11"
+                           MaxLines="1"
+                           LineBreakMode="NoWrap"
+                           HorizontalTextAlignment="Center" />
+                </VerticalStackLayout>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnVotingTapped" />
+                </Border.GestureRecognizers>
+            </Border>
+
+            <Border x:Name="MaterialsShell"
+                    Grid.Column="3"
+                    Padding="8,8"
+                    StrokeThickness="0">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="20" />
+                </Border.StrokeShape>
+                <VerticalStackLayout HorizontalOptions="Center"
+                                     Spacing="4">
+                    <Image x:Name="MaterialsIcon"
+                           Source="icon_library.svg"
+                           HeightRequest="18"
+                           WidthRequest="18" />
+                    <Label x:Name="MaterialsLabel"
+                           Text="Courses"
+                           FontSize="11"
+                           MaxLines="1"
+                           LineBreakMode="NoWrap"
+                           HorizontalTextAlignment="Center" />
+                </VerticalStackLayout>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnMaterialsTapped" />
+                </Border.GestureRecognizers>
+            </Border>
+
+            <Border x:Name="ProfileShell"
+                    Grid.Column="4"
+                    Padding="8,8"
+                    StrokeThickness="0">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="20" />
+                </Border.StrokeShape>
+                <VerticalStackLayout HorizontalOptions="Center"
+                                     Spacing="4">
+                    <Image x:Name="ProfileIcon"
+                           Source="icon_profile.svg"
+                           HeightRequest="18"
+                           WidthRequest="18" />
+                    <Label x:Name="ProfileLabel"
+                           Text="Profile"
+                           FontSize="11"
+                           MaxLines="1"
+                           LineBreakMode="NoWrap"
+                           HorizontalTextAlignment="Center" />
+                </VerticalStackLayout>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnProfileTapped" />
+                </Border.GestureRecognizers>
+            </Border>
+        </Grid>
+    </Border>
+</ContentView>

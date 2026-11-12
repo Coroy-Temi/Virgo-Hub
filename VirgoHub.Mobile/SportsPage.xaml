@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:VirgoHub.Mobile.Controls"
+             x:Class="VirgoHub.Mobile.SportsPage"
+             Title="Sports"
+             NavigationPage.HasNavigationBar="False"
+             BackgroundColor="{AppThemeBinding Light=#EFF7FF, Dark=#07172C}">
+    <Grid RowDefinitions="*,Auto">
+        <ScrollView Grid.Row="0">
+            <VerticalStackLayout Padding="20,18,20,22" Spacing="18">
+                <Border Padding="18"
+                        BackgroundColor="{AppThemeBinding Light=White, Dark=#102542}"
+                        Stroke="{AppThemeBinding Light=#DCEEFF, Dark=#1A3B70}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="28" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Sports Booking"
+                               FontSize="28"
+                               FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                        <Label Text="Request any suitable time for a facility. The sports director approves it before it becomes booked."
+                               FontSize="13"
+                               TextColor="{AppThemeBinding Light=#6884A5, Dark=#C8D9F0}" />
+                        <Picker Title="Choose facility"
+                                ItemsSource="{Binding Store.Facilities}"
+                                ItemDisplayBinding="{Binding Name}"
+                                SelectedItem="{Binding SelectedFacility}" />
+                        <DatePicker Date="{Binding SelectedBookingDate}" />
+                        <Entry Text="{Binding RequestedTime}"
+                               Placeholder="Preferred time, for example 4:30 PM - 5:30 PM" />
+                        <Entry Text="{Binding BookingPurpose}"
+                               Placeholder="Purpose or team name" />
+                        <Button Text="Send Booking Request"
+                                BackgroundColor="#25A9F5"
+                                FontAttributes="Bold"
+                                TextColor="White"
+                                Clicked="OnReserveClicked" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border IsVisible="{Binding Store.HasSportsDirectorAccess}"
+                        Padding="18"
+                        BackgroundColor="{AppThemeBinding Light=White, Dark=#102542}"
+                        Stroke="{AppThemeBinding Light=#DCEEFF, Dark=#1A3B70}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="28" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Sports Director Desk"
+                               FontSize="22"
+                               FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                        <Label Text="{Binding Store.SportsDirectorSummary}"
+                               FontSize="13"
+                               TextColor="{AppThemeBinding Light=#6884A5, Dark=#C8D9F0}" />
+                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding Store.SportsDirectorBookings}" Spacing="10">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Padding="14"
+                                            BackgroundColor="{AppThemeBinding Light=#F7FBFF, Dark=#0B2249}"
+                                            StrokeThickness="0">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="20" />
+                                        </Border.StrokeShape>
+                                        <VerticalStackLayout Spacing="6">
+                                            <Label Text="{Binding StudentName}" FontAttributes="Bold" TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                                            <Label Text="{Binding FacilityName}" TextColor="{AppThemeBinding Light=#6884A5, Dark=#C8D9F0}" />
+                                            <Label Text="{Binding BookingDate, StringFormat='{}{0:dd MMM yyyy}'}" TextColor="#25A9F5" />
+                                            <Label Text="{Binding SlotLabel}" TextColor="{AppThemeBinding Light=#6884A5, Dark=#C8D9F0}" />
+                                            <Label Text="{Binding Status}" TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                                            <Button Text="Approve Booking"
+                                                    IsVisible="False"
+                                                    BackgroundColor="#0B2A56"
+                                                    TextColor="White"
+                                                    Clicked="OnApproveBookingClicked">
+                                                <Button.Triggers>
+                                                    <DataTrigger TargetType="Button"
+                                                                 Binding="{Binding Status}"
+                                                                 Value="PendingApproval">
+                                                        <Setter Property="IsVisible" Value="True" />
+                                                    </DataTrigger>
+                                                </Button.Triggers>
+                                            </Button>
+                                        </VerticalStackLayout>
+                                    </Border>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Padding="18"
+                        BackgroundColor="{AppThemeBinding Light=White, Dark=#102542}"
+                        Stroke="{AppThemeBinding Light=#DCEEFF, Dark=#1A3B70}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="28" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="My Bookings"
+                               FontSize="22"
+                               FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding Store.MyBookings}" Spacing="10">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Padding="14"
+                                            BackgroundColor="{AppThemeBinding Light=#F2F7FF, Dark=#0B2249}"
+                                            StrokeThickness="0">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="18" />
+                                        </Border.StrokeShape>
+                                        <VerticalStackLayout Spacing="4">
+                                            <Label Text="{Binding FacilityName}" FontAttributes="Bold" TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                                            <Label Text="{Binding Purpose}" TextColor="{AppThemeBinding Light=#6884A5, Dark=#C8D9F0}" />
+                                            <Label Text="{Binding BookingDate, StringFormat='{}{0:dd MMM yyyy}'}" TextColor="#25A9F5" />
+                                            <Label Text="{Binding SlotLabel}" TextColor="{AppThemeBinding Light=#6884A5, Dark=#C8D9F0}" />
+                                            <Label Text="{Binding Status}" TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                                        </VerticalStackLayout>
+                                    </Border>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <controls:PortalBottomNav Grid.Row="1"
+                                  ActiveTab="Home" />
+    </Grid>
+</ContentPage>

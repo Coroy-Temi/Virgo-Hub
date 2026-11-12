@@ -1,0 +1,23 @@
+@inject NavigationManager Navigation
+
+<div class="login-redirect-shell">
+    <div class="login-redirect-card">
+        <div class="brand-pill">VirgoHub</div>
+        <h1>Redirecting to the secure portal</h1>
+        <p>Please wait while your portal access is confirmed.</p>
+    </div>
+</div>
+
+@code {
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        var currentPath = Navigation.ToBaseRelativePath(Navigation.Uri);
+        var normalized = string.IsNullOrWhiteSpace(currentPath) ? "/" : $"/{currentPath}";
+        Navigation.NavigateTo($"/login?returnUrl={Uri.EscapeDataString(normalized)}", forceLoad: true);
+    }
+}

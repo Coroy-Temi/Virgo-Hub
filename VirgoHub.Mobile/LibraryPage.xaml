@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:VirgoHub.Mobile.Controls"
+             x:Class="VirgoHub.Mobile.LibraryPage"
+             Title="Materials"
+             NavigationPage.HasNavigationBar="False"
+             BackgroundColor="{AppThemeBinding Light=#F3F7FF, Dark=#07172C}">
+    <Grid RowDefinitions="*,Auto">
+        <ScrollView Grid.Row="0">
+            <VerticalStackLayout Padding="18,16,18,20" Spacing="18">
+                <Border Padding="18"
+                        BackgroundColor="{AppThemeBinding Light=White, Dark=#102542}"
+                        Stroke="{AppThemeBinding Light=#D8E5FB, Dark=#1A3B70}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="26" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout Spacing="12">
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                            <Image Grid.Column="0" Source="icon_library.svg" HeightRequest="50" WidthRequest="50" />
+                            <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                <Label Text="{Binding PageTitle}"
+                                       x:Name="LibraryTitleLabel"
+                                       FontSize="24"
+                                       FontAttributes="Bold"
+                                       TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                                <Label Text="{Binding PageSummary}"
+                                       x:Name="LibrarySummaryLabel"
+                                       FontSize="13"
+                                       TextColor="{AppThemeBinding Light=#5B78A2, Dark=#C8D9F0}" />
+                            </VerticalStackLayout>
+                        </Grid>
+
+                        <Entry Text="{Binding CourseCodeQuery}"
+                               Placeholder="{Binding EntryPlaceholder}" />
+                        <Button Text="{Binding ActionButtonText}"
+                                BackgroundColor="#0F4BA8"
+                                Clicked="OnEnrollCourseClicked" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Padding="18"
+                        BackgroundColor="{AppThemeBinding Light=White, Dark=#102542}"
+                        Stroke="{AppThemeBinding Light=#D8E5FB, Dark=#1A3B70}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="26" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="{Binding SpacesTitle}"
+                               FontSize="22"
+                               FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding Store.MyCourseEnrollments}" Spacing="10">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Padding="14"
+                                            BackgroundColor="{AppThemeBinding Light=#F2F7FF, Dark=#0B2249}"
+                                            StrokeThickness="0">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="18" />
+                                        </Border.StrokeShape>
+                                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                                            <VerticalStackLayout Grid.Column="0" Spacing="4">
+                                                <Label Text="{Binding CourseCode}" FontAttributes="Bold" TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                                                <Label Text="{Binding CourseTitle}" TextColor="{AppThemeBinding Light=#5B78A2, Dark=#C8D9F0}" />
+                                                <Label Text="{Binding Status}" TextColor="#0F4BA8" />
+                                                <Label Text="{Binding EnrolledAt, StringFormat='{}Enrolled: {0:dd MMM yyyy, hh:mm tt}'}" TextColor="#0F4BA8" />
+                                            </VerticalStackLayout>
+                                            <Button Grid.Column="1"
+                                                    Text="Open"
+                                                    BackgroundColor="#DCEBFF"
+                                                    TextColor="#0B2A56"
+                                                    Clicked="OnOpenCourseClicked" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <controls:PortalBottomNav Grid.Row="1"
+                                  ActiveTab="Materials" />
+    </Grid>
+</ContentPage>

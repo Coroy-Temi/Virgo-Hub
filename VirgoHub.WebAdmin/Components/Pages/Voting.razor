@@ -1,0 +1,505 @@
+@page "/voting"
+@attribute [Authorize(Roles = "SuperAdmin,Admin")]
+@inject VirgoHubService Hub
+
+<PageTitle>VirgoHub Voting</PageTitle>
+
+@if (!hasAccess)
+{
+    <section class="surface-card">
+        <div class="empty-state-vgh">
+            <strong>Access restricted</strong>
+            <span>Your portal account does not have permission to manage voting.</span>
+        </div>
+    </section>
+}
+else
+{
+<section class="page-intro">
+    <div>
+        <div class="section-kicker">Voting Desk</div>
+        <h2>Build elections with live candidates and visible results.</h2>
+        <p>Create election windows, add multiple candidates, update ballots, and keep live results visible until you remove the election.</p>
+    </div>
+</section>
+
+@if (!string.IsNullOrWhiteSpace(feedback))
+{
+    <div class="toast-banner @feedbackType">@feedback</div>
+}
+
+<section class="dashboard-grid">
+    <div class="surface-card">
+        <div class="surface-head">
+            <h3>Create election</h3>
+        </div>
+        <div class="form-grid-vgh">
+            <label><span>Election title</span><InputText @bind-Value="electionTitle" /></label>
+            <label><span>Position</span><InputText @bind-Value="electionPosition" /></label>
+            <label><span>Faculty</span><InputText @bind-Value="electionAudienceFaculty" /></label>
+            <label class="full-span"><span>Departments</span><InputTextArea @bind-Value="electionAudienceDepartmentsText" placeholder="Leave blank for the whole faculty, or enter one or more departments separated by commas." /></label>
+            <label><span>Opens on</span><InputDate @bind-Value="electionStartsOn" /></label>
+            <label><span>Closes on</span><InputDate @bind-Value="electionClosesOn" /></label>
+        </div>
+
+        <div class="surface-head" style="margin-top: 1rem;">
+            <h3>Candidate list</h3>
+        </div>
+        <div class="form-grid-vgh">
+            <label><span>Name</span><InputText @bind-Value="candidateDraftName" /></label>
+            <label><span>Department</span><InputText @bind-Value="candidateDraftDepartment" /></label>
+            <label class="full-span"><span>Manifesto</span><InputTextArea @bind-Value="candidateDraftManifesto" /></label>
+        </div>
+        <div style="margin-top: 0.9rem; display: flex; gap: 0.75rem; flex-wrap: wrap;">
+            <button class="vgh-button alt" @onclick="AddCreateCandidate">Add candidate</button>
+            <button class="vgh-button" @onclick="CreateElectionAsync">Launch election</button>
+        </div>
+
+        @if (createCandidates.Count > 0)
+        {
+            <div class="list-stack" style="margin-top: 1rem;">
+                @foreach (var item in createCandidates)
+                {
+                    <div class="list-item-vgh">
+                        <div>
+                            <strong>@item.Name</strong>
+                            <div>@item.Department</div>
+                        </div>
+                        <button class="ghost-link" @onclick="() => RemoveCreateCandidate(item.Id)">Remove</button>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+    <div class="surface-card">
+        <div class="surface-head">
+            <h3>Edit election</h3>
+        </div>
+        <div class="form-grid-vgh">
+            <label class="full-span">
+                <span>Select election</span>
+                <InputSelect @bind-Value="selectedElectionId">
+                    <option value="">Choose an election</option>
+                    @foreach (var item in elections)
+                    {
+                        <option value="@item.Id">@item.Title - @item.Position</option>
+                    }
+                </InputSelect>
+            </label>
+        </div>
+        <div style="margin-top: 0.9rem; display: flex; gap: 0.75rem; flex-wrap: wrap;">
+            <button class="vgh-button alt" @onclick="LoadElectionEditor">Load election</button>
+            @if (selectedElection is not null)
+            {
+                <button class="vgh-button" @onclick="UpdateElectionAsync">Save changes</button>
+                <button class="vgh-button alt" @onclick="DeleteElectionAsync">Delete election</button>
+            }
+        </div>
+
+        @if (selectedElection is not null)
+        {
+            <div class="form-grid-vgh" style="margin-top: 1rem;">
+                <label><span>Election title</span><InputText @bind-Value="electionEditor.Title" /></label>
+                <label><span>Position</span><InputText @bind-Value="electionEditor.Position" /></label>
+                <label><span>Faculty</span><InputText @bind-Value="electionEditor.AudienceFaculty" /></label>
+                <label class="full-span"><span>Departments</span><InputTextArea @bind-Value="electionEditorDepartmentsText" placeholder="Leave blank for the whole faculty, or enter one or more departments separated by commas." /></label>
+                <label><span>Opens on</span><InputDate @bind-Value="electionEditStartsOn" /></label>
+                <label><span>Closes on</span><InputDate @bind-Value="electionEditClosesOn" /></label>
+                <label>
+                    <span>Availability</span>
+                    <InputSelect @bind-Value="electionEditor.IsActive">
+                        <option value="true">Active</option>
+                        <option value="false">Closed</option>
+                    </InputSelect>
+                </label>
+            </div>
+
+            <div class="surface-head" style="margin-top: 1rem;">
+                <h3>Ballot candidates</h3>
+            </div>
+            <div class="form-grid-vgh">
+                <label><span>Name</span><InputText @bind-Value="editCandidateDraftName" /></label>
+                <label><span>Department</span><InputText @bind-Value="editCandidateDraftDepartment" /></label>
+                <label class="full-span"><span>Manifesto</span><InputTextArea @bind-Value="editCandidateDraftManifesto" /></label>
+            </div>
+            <button class="vgh-button alt" style="margin-top: 0.9rem;" @onclick="AddEditCandidate">Add candidate</button>
+
+            @if (editCandidates.Count > 0)
+            {
+                <div class="list-stack" style="margin-top: 1rem;">
+                    @foreach (var item in editCandidates)
+                    {
+                        <div class="list-item-vgh">
+                            <div>
+                                <strong>@item.Name</strong>
+                                <div>@item.Department</div>
+                            </div>
+                            <button class="ghost-link" @onclick="() => RemoveEditCandidate(item.Id)">Remove</button>
+                        </div>
+                    }
+                </div>
+            }
+        }
+    </div>
+</section>
+
+<section class="surface-card">
+    <div class="surface-head">
+        <h3>Election board</h3>
+        <span>@elections.Count entries</span>
+    </div>
+    <div class="table-shell">
+        <table>
+            <thead>
+                <tr>
+                    <th>Election</th>
+                    <th>Position</th>
+                    <th>Audience</th>
+                    <th>Window</th>
+                    <th>Candidates</th>
+                    <th>Votes</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in elections)
+                {
+                    <tr>
+                        <td>@item.Title</td>
+                        <td>@item.Position</td>
+                        <td>@FormatAudience(item.AudienceFaculty, item.AudienceDepartments)</td>
+                        <td>@item.OpensAt.LocalDateTime.ToString("dd MMM") - @item.ClosesAt.LocalDateTime.ToString("dd MMM")</td>
+                        <td>@item.Candidates.Count</td>
+                        <td>@item.TotalVotes</td>
+                        <td>@GetElectionState(item)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</section>
+
+@if (selectedElection is not null)
+{
+    <section class="surface-card">
+        <div class="surface-head">
+            <h3>Live results</h3>
+            <span>@selectedElection.TotalVotes total votes</span>
+        </div>
+        <div class="table-shell">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Candidate</th>
+                        <th>Department</th>
+                        <th>Votes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var candidate in selectedElection.Candidates)
+                    {
+                        <tr>
+                            <td>@candidate.Name</td>
+                            <td>@candidate.Department</td>
+                            <td>@candidate.VoteCount</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
+}
+}
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthenticationStateTask { get; set; }
+
+    private List<Election> elections = [];
+    private List<CandidateInputDraft> createCandidates = [];
+    private List<CandidateInputDraft> editCandidates = [];
+    private UserProfile? currentUser;
+    private Election? selectedElection;
+    private UpdateElectionRequest electionEditor = new() { IsActive = true };
+    private string selectedElectionId = string.Empty;
+    private string feedback = string.Empty;
+    private string feedbackType = "ok";
+    private string electionTitle = string.Empty;
+    private string electionPosition = string.Empty;
+    private string electionAudienceFaculty = string.Empty;
+    private string electionAudienceDepartmentsText = string.Empty;
+    private string electionEditorDepartmentsText = string.Empty;
+    private DateTime electionStartsOn = DateTime.Today;
+    private DateTime electionClosesOn = DateTime.Today.AddDays(2);
+    private DateTime electionEditStartsOn = DateTime.Today;
+    private DateTime electionEditClosesOn = DateTime.Today.AddDays(2);
+    private string candidateDraftName = string.Empty;
+    private string candidateDraftDepartment = string.Empty;
+    private string candidateDraftManifesto = string.Empty;
+    private string editCandidateDraftName = string.Empty;
+    private string editCandidateDraftDepartment = string.Empty;
+    private string editCandidateDraftManifesto = string.Empty;
+    private bool hasAccess;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (AuthenticationStateTask is null)
+        {
+            return;
+        }
+
+        var authState = await AuthenticationStateTask;
+        var userId = authState.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        currentUser = string.IsNullOrWhiteSpace(userId) ? null : Hub.GetUserById(userId);
+        hasAccess = currentUser is not null && (currentUser.Role == UserRole.SuperAdmin || Hub.CanAccessModule(currentUser.Id, AdminModule.Voting));
+
+        if (hasAccess)
+        {
+            Reload();
+        }
+    }
+
+    private void AddCreateCandidate()
+    {
+        try
+        {
+            createCandidates.Add(BuildDraft(candidateDraftName, candidateDraftDepartment, candidateDraftManifesto));
+            ClearCreateCandidateDraft();
+            feedback = "Candidate added to the ballot draft.";
+            feedbackType = "ok";
+        }
+        catch (Exception ex)
+        {
+            feedback = ex.Message;
+            feedbackType = "error";
+        }
+    }
+
+    private void AddEditCandidate()
+    {
+        try
+        {
+            editCandidates.Add(BuildDraft(editCandidateDraftName, editCandidateDraftDepartment, editCandidateDraftManifesto));
+            ClearEditCandidateDraft();
+            feedback = "Candidate added to the election editor.";
+            feedbackType = "ok";
+        }
+        catch (Exception ex)
+        {
+            feedback = ex.Message;
+            feedbackType = "error";
+        }
+    }
+
+    private static CandidateInputDraft BuildDraft(string name, string department, string manifesto)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new InvalidOperationException("Candidate name is required.");
+        }
+
+        return new CandidateInputDraft
+        {
+            Name = name.Trim(),
+            Department = department.Trim(),
+            Manifesto = manifesto.Trim()
+        };
+    }
+
+    private void RemoveCreateCandidate(string id) => createCandidates.RemoveAll(x => x.Id == id);
+
+    private void RemoveEditCandidate(string id) => editCandidates.RemoveAll(x => x.Id == id);
+
+    private async Task CreateElectionAsync()
+    {
+        try
+        {
+            await Hub.CreateElectionAsync(new CreateElectionRequest
+            {
+                Title = electionTitle,
+                Position = electionPosition,
+                AudienceFaculty = electionAudienceFaculty,
+                AudienceDepartments = ParseDepartments(electionAudienceDepartmentsText),
+                OpensAt = new DateTimeOffset(electionStartsOn.Year, electionStartsOn.Month, electionStartsOn.Day, 8, 0, 0, TimeSpan.Zero),
+                ClosesAt = new DateTimeOffset(electionClosesOn.Year, electionClosesOn.Month, electionClosesOn.Day, 18, 0, 0, TimeSpan.Zero),
+                Candidates = createCandidates
+                    .Select(x => new CandidateInput
+                    {
+                        Name = x.Name,
+                        Department = x.Department,
+                        Manifesto = x.Manifesto
+                    })
+                    .ToList()
+            }, currentUser?.Id);
+
+            feedback = "The election has been created.";
+            feedbackType = "ok";
+            electionTitle = string.Empty;
+            electionPosition = string.Empty;
+            electionAudienceFaculty = string.Empty;
+            electionAudienceDepartmentsText = string.Empty;
+            electionStartsOn = DateTime.Today;
+            electionClosesOn = DateTime.Today.AddDays(2);
+            createCandidates.Clear();
+            Reload();
+        }
+        catch (Exception ex)
+        {
+            feedback = ex.Message;
+            feedbackType = "error";
+        }
+    }
+
+    private void LoadElectionEditor()
+    {
+        selectedElection = elections.FirstOrDefault(x => x.Id == selectedElectionId);
+        if (selectedElection is null)
+        {
+            feedback = "Select an election first.";
+            feedbackType = "error";
+            return;
+        }
+
+        electionEditor = new UpdateElectionRequest
+        {
+            Title = selectedElection.Title,
+            Position = selectedElection.Position,
+            AudienceFaculty = selectedElection.AudienceFaculty,
+            AudienceDepartments = selectedElection.AudienceDepartments.ToList(),
+            OpensAt = selectedElection.OpensAt,
+            ClosesAt = selectedElection.ClosesAt,
+            IsActive = selectedElection.IsActive
+        };
+        electionEditorDepartmentsText = string.Join(", ", selectedElection.AudienceDepartments);
+        electionEditStartsOn = selectedElection.OpensAt.LocalDateTime.Date;
+        electionEditClosesOn = selectedElection.ClosesAt.LocalDateTime.Date;
+        editCandidates = selectedElection.Candidates
+            .Select(x => new CandidateInputDraft
+            {
+                Name = x.Name,
+                Department = x.Department,
+                Manifesto = x.Manifesto
+            })
+            .ToList();
+    }
+
+    private async Task UpdateElectionAsync()
+    {
+        try
+        {
+            if (selectedElection is null)
+            {
+                throw new InvalidOperationException("Load an election first.");
+            }
+
+            electionEditor.OpensAt = new DateTimeOffset(electionEditStartsOn.Year, electionEditStartsOn.Month, electionEditStartsOn.Day, 8, 0, 0, TimeSpan.Zero);
+            electionEditor.ClosesAt = new DateTimeOffset(electionEditClosesOn.Year, electionEditClosesOn.Month, electionEditClosesOn.Day, 18, 0, 0, TimeSpan.Zero);
+            electionEditor.AudienceDepartments = ParseDepartments(electionEditorDepartmentsText);
+            electionEditor.Candidates = editCandidates
+                .Select(x => new CandidateInput
+                {
+                    Name = x.Name,
+                    Department = x.Department,
+                    Manifesto = x.Manifesto
+                })
+                .ToList();
+
+            await Hub.UpdateElectionAsync(selectedElection.Id, electionEditor, currentUser?.Id);
+            feedback = "The election has been updated.";
+            feedbackType = "ok";
+            Reload();
+            LoadElectionEditor();
+        }
+        catch (Exception ex)
+        {
+            feedback = ex.Message;
+            feedbackType = "error";
+        }
+    }
+
+    private async Task DeleteElectionAsync()
+    {
+        try
+        {
+            if (selectedElection is null)
+            {
+                throw new InvalidOperationException("Load an election first.");
+            }
+
+            await Hub.DeleteElectionAsync(selectedElection.Id, currentUser?.Id);
+            feedback = "The election has been deleted.";
+            feedbackType = "ok";
+            selectedElection = null;
+            selectedElectionId = string.Empty;
+            editCandidates.Clear();
+            electionEditorDepartmentsText = string.Empty;
+            Reload();
+        }
+        catch (Exception ex)
+        {
+            feedback = ex.Message;
+            feedbackType = "error";
+        }
+    }
+
+    private void Reload() => elections = Hub.GetElections(currentUser?.Id).ToList();
+
+    private static string GetElectionState(Election election)
+    {
+        if (election.IsOpen)
+        {
+            return "Open";
+        }
+
+        if (election.IsClosed)
+        {
+            return "Closed";
+        }
+
+        return "Scheduled";
+    }
+
+    private void ClearCreateCandidateDraft()
+    {
+        candidateDraftName = string.Empty;
+        candidateDraftDepartment = string.Empty;
+        candidateDraftManifesto = string.Empty;
+    }
+
+    private void ClearEditCandidateDraft()
+    {
+        editCandidateDraftName = string.Empty;
+        editCandidateDraftDepartment = string.Empty;
+        editCandidateDraftManifesto = string.Empty;
+    }
+
+    private static List<string> ParseDepartments(string? raw) =>
+        (raw ?? string.Empty)
+            .Split([',', '\n', '\r'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+    private static string FormatAudience(string? faculty, IEnumerable<string>? departments)
+    {
+        var facultyLabel = faculty?.Trim();
+        var departmentList = ParseDepartments(string.Join(",", departments ?? Array.Empty<string>()));
+
+        if (string.IsNullOrWhiteSpace(facultyLabel))
+        {
+            return "Campus-wide";
+        }
+
+        return departmentList.Count == 0
+            ? $"{facultyLabel} faculty"
+            : $"{facultyLabel}: {string.Join(", ", departmentList)}";
+    }
+
+    private sealed class CandidateInputDraft
+    {
+        public string Id { get; set; } = Guid.NewGuid().ToString("N");
+        public string Name { get; set; } = string.Empty;
+        public string Department { get; set; } = string.Empty;
+        public string Manifesto { get; set; } = string.Empty;
+    }
+}

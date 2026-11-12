@@ -1,0 +1,459 @@
+@page "/admins"
+@attribute [Authorize(Roles = "SuperAdmin")]
+@inject VirgoHubService Hub
+
+<PageTitle>VirgoHub Portal Access</PageTitle>
+
+<section class="page-intro">
+    <div>
+        <div class="section-kicker">Portal Access</div>
+        <h2>Control operations admins and lecturer logins from one desk.</h2>
+        <p>Assign focused access for operations teams, then create lecturer accounts that manage course materials through Virgo mail or staff ID.</p>
+    </div>
+</section>
+
+@if (!string.IsNullOrWhiteSpace(feedback))
+{
+    <div class="toast-banner @feedbackType">@feedback</div>
+}
+
+<section class="dashboard-grid">
+    <div class="surface-card">
+        <div class="surface-head">
+            <h3>Create operations admin</h3>
+        </div>
+        <div class="form-grid-vgh">
+            <label><span>Full name</span><InputText @bind-Value="admin.FullName" /></label>
+            <label><span>Portal email</span><InputText @bind-Value="admin.Email" /></label>
+            <label><span>Temporary password</span><InputText @bind-Value="admin.Password" type="password" /></label>
+            <label><span>Department</span><InputText @bind-Value="admin.Department" /></label>
+            <label><span>Faculty</span><InputText @bind-Value="admin.Faculty" /></label>
+        </div>
+
+        <div class="surface-head" style="margin-top: 1rem;">
+            <h3>Assigned pages</h3>
+        </div>
+        <div class="module-toggle-grid">
+            @foreach (var module in ModuleOptions)
+            {
+                <button class="module-toggle @(createModules.Contains(module) ? "active" : string.Empty)"
+                        type="button"
+                        @onclick="() => ToggleCreateModule(module)">
+                    @module
+                </button>
+            }
+        </div>
+
+        <button class="vgh-button" style="margin-top: 1rem;" @onclick="CreateAdminAsync">Create operations admin</button>
+    </div>
+
+    <div class="surface-card">
+        <div class="surface-head">
+            <h3>Edit operations admin</h3>
+        </div>
+        <div class="form-grid-vgh">
+            <label class="full-span">
+                <span>Select admin</span>
+                <InputSelect @bind-Value="selectedAdminId">
+                    <option value="">Choose an operations admin</option>
+                    @foreach (var item in admins)
+                    {
+                        <option value="@item.Id">@item.FullName - @item.Email</option>
+                    }
+                </InputSelect>
+            </label>
+        </div>
+
+        <div style="margin-top: 0.9rem; display: flex; gap: 0.75rem; flex-wrap: wrap;">
+            <button class="vgh-button alt" @onclick="LoadAdminEditor">Load admin</button>
+            @if (selectedAdmin is not null)
+            {
+                <button class="vgh-button" @onclick="UpdateAdminAsync">Save changes</button>
+                <button class="vgh-button alt" @onclick="DeleteAdminAsync">Delete admin</button>
+            }
+        </div>
+
+        @if (selectedAdmin is not null)
+        {
+            <div class="form-grid-vgh" style="margin-top: 1rem;">
+                <label><span>Full name</span><InputText @bind-Value="adminEditor.FullName" /></label>
+                <label><span>Portal email</span><InputText @bind-Value="adminEditor.Email" /></label>
+                <label><span>Department</span><InputText @bind-Value="adminEditor.Department" /></label>
+                <label><span>Faculty</span><InputText @bind-Value="adminEditor.Faculty" /></label>
+                <label class="full-span"><span>New password (optional)</span><InputText @bind-Value="adminEditor.Password" type="password" /></label>
+            </div>
+
+            <div class="surface-head" style="margin-top: 1rem;">
+                <h3>Assigned pages</h3>
+            </div>
+            <div class="module-toggle-grid">
+                @foreach (var module in ModuleOptions)
+                {
+                    <button class="module-toggle @(editModules.Contains(module) ? "active" : string.Empty)"
+                            type="button"
+                            @onclick="() => ToggleEditModule(module)">
+                        @module
+                    </button>
+                }
+            </div>
+        }
+    </div>
+</section>
+
+<section class="dashboard-grid">
+    <div class="surface-card">
+        <div class="surface-head">
+            <h3>Create lecturer login</h3>
+        </div>
+        <div class="form-grid-vgh">
+            <label><span>Lecturer name</span><InputText @bind-Value="lecturer.FullName" /></label>
+            <label><span>Virgo mail</span><InputText @bind-Value="lecturer.Email" /></label>
+            <label><span>Staff ID</span><InputText @bind-Value="lecturer.StaffId" /></label>
+            <label><span>Temporary password</span><InputText @bind-Value="lecturer.Password" type="password" /></label>
+            <label><span>Faculty</span><InputText @bind-Value="lecturer.Faculty" /></label>
+            <label><span>Department</span><InputText @bind-Value="lecturer.Department" /></label>
+        </div>
+
+        <button class="vgh-button" style="margin-top: 1rem;" @onclick="CreateLecturerAsync">Create lecturer login</button>
+    </div>
+
+    <div class="surface-card">
+        <div class="surface-head">
+            <h3>Edit lecturer login</h3>
+        </div>
+        <div class="form-grid-vgh">
+            <label class="full-span">
+                <span>Select lecturer</span>
+                <InputSelect @bind-Value="selectedLecturerId">
+                    <option value="">Choose a lecturer</option>
+                    @foreach (var item in lecturers)
+                    {
+                        <option value="@item.Id">@item.FullName - @item.StaffId</option>
+                    }
+                </InputSelect>
+            </label>
+        </div>
+
+        <div style="margin-top: 0.9rem; display: flex; gap: 0.75rem; flex-wrap: wrap;">
+            <button class="vgh-button alt" @onclick="LoadLecturerEditor">Load lecturer</button>
+            @if (selectedLecturer is not null)
+            {
+                <button class="vgh-button" @onclick="UpdateLecturerAsync">Save changes</button>
+                <button class="vgh-button alt" @onclick="DeleteLecturerAsync">Delete lecturer</button>
+            }
+        </div>
+
+        @if (selectedLecturer is not null)
+        {
+            <div class="form-grid-vgh" style="margin-top: 1rem;">
+                <label><span>Lecturer name</span><InputText @bind-Value="lecturerEditor.FullName" /></label>
+                <label><span>Virgo mail</span><InputText @bind-Value="lecturerEditor.Email" /></label>
+                <label><span>Staff ID</span><InputText @bind-Value="lecturerEditor.StaffId" /></label>
+                <label><span>Faculty</span><InputText @bind-Value="lecturerEditor.Faculty" /></label>
+                <label><span>Department</span><InputText @bind-Value="lecturerEditor.Department" /></label>
+                <label class="full-span"><span>New password (optional)</span><InputText @bind-Value="lecturerEditor.Password" type="password" /></label>
+            </div>
+        }
+    </div>
+</section>
+
+<section class="dashboard-grid">
+    <div class="surface-card">
+        <div class="surface-head">
+            <h3>Operations admin registry</h3>
+            <span>@admins.Count admins</span>
+        </div>
+        <div class="table-shell">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Department</th>
+                        <th>Assigned pages</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in admins)
+                    {
+                        <tr>
+                            <td>@item.FullName</td>
+                            <td>@item.Email</td>
+                            <td>@item.Department</td>
+                            <td>@string.Join(", ", item.AdminModules)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="surface-card">
+        <div class="surface-head">
+            <h3>Lecturer registry</h3>
+            <span>@lecturers.Count lecturers</span>
+        </div>
+        <div class="table-shell">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Virgo mail</th>
+                        <th>Staff ID</th>
+                        <th>Faculty</th>
+                        <th>Department</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in lecturers)
+                    {
+                        <tr>
+                            <td>@item.FullName</td>
+                            <td>@item.Email</td>
+                            <td>@item.StaffId</td>
+                            <td>@item.Faculty</td>
+                            <td>@item.Department</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthenticationStateTask { get; set; }
+
+    private RegisterPortalAdminRequest admin = new();
+    private UpdatePortalAdminRequest adminEditor = new();
+    private RegisterLecturerRequest lecturer = new();
+    private UpdateLecturerRequest lecturerEditor = new();
+    private List<UserProfile> admins = [];
+    private List<UserProfile> lecturers = [];
+    private UserProfile? selectedAdmin;
+    private UserProfile? selectedLecturer;
+    private string selectedAdminId = string.Empty;
+    private string selectedLecturerId = string.Empty;
+    private string feedback = string.Empty;
+    private string feedbackType = "ok";
+    private HashSet<AdminModule> createModules = [];
+    private HashSet<AdminModule> editModules = [];
+    private UserProfile? currentUser;
+
+    private IReadOnlyList<AdminModule> ModuleOptions { get; } = Enum.GetValues<AdminModule>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (AuthenticationStateTask is not null)
+        {
+            var authState = await AuthenticationStateTask;
+            var userId = authState.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            currentUser = string.IsNullOrWhiteSpace(userId) ? null : Hub.GetUserById(userId);
+        }
+
+        admin.Department = "School Operations";
+        admin.Faculty = "Administration";
+        lecturer.Faculty = "Computing and Digital Technologies";
+        Reload();
+    }
+
+    private void ToggleCreateModule(AdminModule module)
+    {
+        if (!createModules.Add(module))
+        {
+            createModules.Remove(module);
+        }
+    }
+
+    private void ToggleEditModule(AdminModule module)
+    {
+        if (!editModules.Add(module))
+        {
+            editModules.Remove(module);
+        }
+    }
+
+    private async Task CreateAdminAsync()
+    {
+        try
+        {
+            admin.Modules = createModules.OrderBy(x => x.ToString()).ToList();
+            await Hub.RegisterPortalAdminAsync(admin, currentUser?.Id);
+            feedback = "Operations admin created successfully.";
+            feedbackType = "ok";
+            admin = new RegisterPortalAdminRequest
+            {
+                Department = "School Operations",
+                Faculty = "Administration"
+            };
+            createModules = [];
+            Reload();
+        }
+        catch (Exception ex)
+        {
+            feedback = ex.Message;
+            feedbackType = "error";
+        }
+    }
+
+    private void LoadAdminEditor()
+    {
+        selectedAdmin = admins.FirstOrDefault(x => x.Id == selectedAdminId);
+        if (selectedAdmin is null)
+        {
+            feedback = "Select an operations admin first.";
+            feedbackType = "error";
+            return;
+        }
+
+        adminEditor = new UpdatePortalAdminRequest
+        {
+            FullName = selectedAdmin.FullName,
+            Email = selectedAdmin.Email,
+            Department = selectedAdmin.Department,
+            Faculty = selectedAdmin.Faculty
+        };
+        editModules = selectedAdmin.AdminModules.ToHashSet();
+    }
+
+    private async Task UpdateAdminAsync()
+    {
+        try
+        {
+            if (selectedAdmin is null)
+            {
+                throw new InvalidOperationException("Load an operations admin first.");
+            }
+
+            adminEditor.Modules = editModules.OrderBy(x => x.ToString()).ToList();
+            await Hub.UpdatePortalAdminAsync(selectedAdmin.Id, adminEditor, currentUser?.Id);
+            feedback = "Operations admin updated successfully.";
+            feedbackType = "ok";
+            Reload();
+            LoadAdminEditor();
+        }
+        catch (Exception ex)
+        {
+            feedback = ex.Message;
+            feedbackType = "error";
+        }
+    }
+
+    private async Task DeleteAdminAsync()
+    {
+        try
+        {
+            if (selectedAdmin is null)
+            {
+                throw new InvalidOperationException("Load an operations admin first.");
+            }
+
+            await Hub.DeletePortalAdminAsync(selectedAdmin.Id, currentUser?.Id);
+            feedback = "Operations admin deleted successfully.";
+            feedbackType = "ok";
+            selectedAdmin = null;
+            selectedAdminId = string.Empty;
+            adminEditor = new UpdatePortalAdminRequest();
+            editModules = [];
+            Reload();
+        }
+        catch (Exception ex)
+        {
+            feedback = ex.Message;
+            feedbackType = "error";
+        }
+    }
+
+    private async Task CreateLecturerAsync()
+    {
+        try
+        {
+            await Hub.RegisterLecturerAsync(lecturer, currentUser?.Id);
+            feedback = "Lecturer login created successfully.";
+            feedbackType = "ok";
+            lecturer = new RegisterLecturerRequest
+            {
+                Faculty = "Computing and Digital Technologies"
+            };
+            Reload();
+        }
+        catch (Exception ex)
+        {
+            feedback = ex.Message;
+            feedbackType = "error";
+        }
+    }
+
+    private void LoadLecturerEditor()
+    {
+        selectedLecturer = lecturers.FirstOrDefault(x => x.Id == selectedLecturerId);
+        if (selectedLecturer is null)
+        {
+            feedback = "Select a lecturer first.";
+            feedbackType = "error";
+            return;
+        }
+
+        lecturerEditor = new UpdateLecturerRequest
+        {
+            FullName = selectedLecturer.FullName,
+            Email = selectedLecturer.Email,
+            StaffId = selectedLecturer.StaffId,
+            Faculty = selectedLecturer.Faculty,
+            Department = selectedLecturer.Department
+        };
+    }
+
+    private async Task UpdateLecturerAsync()
+    {
+        try
+        {
+            if (selectedLecturer is null)
+            {
+                throw new InvalidOperationException("Load a lecturer first.");
+            }
+
+            await Hub.UpdateLecturerAsync(selectedLecturer.Id, lecturerEditor, currentUser?.Id);
+            feedback = "Lecturer login updated successfully.";
+            feedbackType = "ok";
+            Reload();
+            LoadLecturerEditor();
+        }
+        catch (Exception ex)
+        {
+            feedback = ex.Message;
+            feedbackType = "error";
+        }
+    }
+
+    private async Task DeleteLecturerAsync()
+    {
+        try
+        {
+            if (selectedLecturer is null)
+            {
+                throw new InvalidOperationException("Load a lecturer first.");
+            }
+
+            await Hub.DeleteLecturerAsync(selectedLecturer.Id, currentUser?.Id);
+            feedback = "Lecturer login deleted successfully.";
+            feedbackType = "ok";
+            selectedLecturer = null;
+            selectedLecturerId = string.Empty;
+            lecturerEditor = new UpdateLecturerRequest();
+            Reload();
+        }
+        catch (Exception ex)
+        {
+            feedback = ex.Message;
+            feedbackType = "error";
+        }
+    }
+
+    private void Reload()
+    {
+        admins = Hub.GetPortalAdmins(currentUser?.Id).ToList();
+        lecturers = Hub.GetLecturers(currentUser?.Id).ToList();
+    }
+}

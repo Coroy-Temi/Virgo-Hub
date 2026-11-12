@@ -1,0 +1,270 @@
+@page "/sports"
+@attribute [Authorize(Roles = "SuperAdmin,Admin")]
+@inject VirgoHubService Hub
+
+<PageTitle>VirgoHub Sports</PageTitle>
+
+@if (!hasAccess)
+{
+    <section class="surface-card">
+        <div class="empty-state-vgh">
+            <strong>Access restricted</strong>
+            <span>Your portal account does not have permission to manage sports operations.</span>
+        </div>
+    </section>
+}
+else
+{
+<section class="page-intro">
+    <div>
+        <div class="section-kicker">Sports Desk</div>
+        <h2>Manage facilities and reservation visibility.</h2>
+        <p>Create, update, and remove facilities while keeping student bookings visible on one page.</p>
+    </div>
+</section>
+
+@if (!string.IsNullOrWhiteSpace(feedback))
+{
+    <div class="toast-banner @feedbackType">@feedback</div>
+}
+
+<section class="dashboard-grid">
+    <div class="surface-card">
+        <div class="surface-head">
+            <h3>Create facility</h3>
+        </div>
+        <div class="form-grid-vgh">
+            <label><span>Name</span><InputText @bind-Value="facility.Name" /></label>
+            <label><span>Location</span><InputText @bind-Value="facility.Location" /></label>
+            <label><span>Open hours</span><InputText @bind-Value="facility.OpenHours" /></label>
+            <label><span>Capacity</span><InputNumber @bind-Value="facility.Capacity" /></label>
+            <label class="full-span"><span>Description</span><InputTextArea @bind-Value="facility.Description" /></label>
+        </div>
+        <button class="vgh-button" @onclick="CreateFacilityAsync">Create facility</button>
+    </div>
+
+    <div class="surface-card">
+        <div class="surface-head">
+            <h3>Edit facility</h3>
+        </div>
+        <div class="form-grid-vgh">
+            <label class="full-span">
+                <span>Select facility</span>
+                <InputSelect @bind-Value="selectedFacilityId">
+                    <option value="">Choose a facility</option>
+                    @foreach (var item in facilities)
+                    {
+                        <option value="@item.Id">@item.Name - @item.Location</option>
+                    }
+                </InputSelect>
+            </label>
+        </div>
+        <div style="margin-top: 0.9rem; display: flex; gap: 0.75rem; flex-wrap: wrap;">
+            <button class="vgh-button alt" @onclick="LoadFacilityEditor">Load facility</button>
+            @if (selectedFacility is not null)
+            {
+                <button class="vgh-button" @onclick="UpdateFacilityAsync">Save changes</button>
+                <button class="vgh-button alt" @onclick="DeleteFacilityAsync">Delete facility</button>
+            }
+        </div>
+
+        @if (selectedFacility is not null)
+        {
+            <div class="form-grid-vgh" style="margin-top: 1rem;">
+                <label><span>Name</span><InputText @bind-Value="facilityEditor.Name" /></label>
+                <label><span>Location</span><InputText @bind-Value="facilityEditor.Location" /></label>
+                <label><span>Open hours</span><InputText @bind-Value="facilityEditor.OpenHours" /></label>
+                <label><span>Capacity</span><InputNumber @bind-Value="facilityEditor.Capacity" /></label>
+                <label class="full-span"><span>Description</span><InputTextArea @bind-Value="facilityEditor.Description" /></label>
+            </div>
+        }
+    </div>
+</section>
+
+<section class="dashboard-grid">
+    <div class="surface-card">
+        <div class="surface-head">
+            <h3>Facility roster</h3>
+            <span>@facilities.Count facilities</span>
+        </div>
+        <div class="table-shell">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Location</th>
+                        <th>Capacity</th>
+                        <th>Open hours</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in facilities)
+                    {
+                        <tr>
+                            <td>@item.Name</td>
+                            <td>@item.Location</td>
+                            <td>@item.Capacity</td>
+                            <td>@item.OpenHours</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="surface-card">
+        <div class="surface-head">
+            <h3>Recent reservations</h3>
+            <span>@bookings.Count bookings</span>
+        </div>
+        <div class="table-shell">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Facility</th>
+                        <th>Slot</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var booking in bookings)
+                    {
+                        <tr>
+                            <td>@booking.StudentName</td>
+                            <td>@booking.FacilityName</td>
+                            <td>@booking.SlotLabel</td>
+                            <td>@booking.BookingDate.ToString("dd MMM yyyy")</td>
+                            <td>@booking.Status</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+}
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthenticationStateTask { get; set; }
+
+    private CreateFacilityRequest facility = new() { Capacity = 10 };
+    private UpdateFacilityRequest facilityEditor = new() { Capacity = 10 };
+    private List<SportsFacility> facilities = [];
+    private List<SportsBooking> bookings = [];
+    private UserProfile? currentUser;
+    private SportsFacility? selectedFacility;
+    private string selectedFacilityId = string.Empty;
+    private string feedback = string.Empty;
+    private string feedbackType = "ok";
+    private bool hasAccess;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (AuthenticationStateTask is null)
+        {
+            return;
+        }
+
+        var authState = await AuthenticationStateTask;
+        var userId = authState.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        currentUser = string.IsNullOrWhiteSpace(userId) ? null : Hub.GetUserById(userId);
+        hasAccess = currentUser is not null && (currentUser.Role == UserRole.SuperAdmin || Hub.CanAccessModule(currentUser.Id, AdminModule.Sports));
+
+        if (hasAccess)
+        {
+            Reload();
+        }
+    }
+
+    private async Task CreateFacilityAsync()
+    {
+        try
+        {
+            await Hub.CreateFacilityAsync(facility, currentUser?.Id);
+            feedback = "Sports facility created successfully.";
+            feedbackType = "ok";
+            facility = new CreateFacilityRequest { Capacity = 10 };
+            Reload();
+        }
+        catch (Exception ex)
+        {
+            feedback = ex.Message;
+            feedbackType = "error";
+        }
+    }
+
+    private void LoadFacilityEditor()
+    {
+        selectedFacility = facilities.FirstOrDefault(x => x.Id == selectedFacilityId);
+        if (selectedFacility is null)
+        {
+            feedback = "Select a facility first.";
+            feedbackType = "error";
+            return;
+        }
+
+        facilityEditor = new UpdateFacilityRequest
+        {
+            Name = selectedFacility.Name,
+            Location = selectedFacility.Location,
+            OpenHours = selectedFacility.OpenHours,
+            Capacity = selectedFacility.Capacity,
+            Description = selectedFacility.Description
+        };
+    }
+
+    private async Task UpdateFacilityAsync()
+    {
+        try
+        {
+            if (selectedFacility is null)
+            {
+                throw new InvalidOperationException("Load a facility first.");
+            }
+
+            await Hub.UpdateFacilityAsync(selectedFacility.Id, facilityEditor, currentUser?.Id);
+            feedback = "Sports facility updated successfully.";
+            feedbackType = "ok";
+            Reload();
+            LoadFacilityEditor();
+        }
+        catch (Exception ex)
+        {
+            feedback = ex.Message;
+            feedbackType = "error";
+        }
+    }
+
+    private async Task DeleteFacilityAsync()
+    {
+        try
+        {
+            if (selectedFacility is null)
+            {
+                throw new InvalidOperationException("Load a facility first.");
+            }
+
+            await Hub.DeleteFacilityAsync(selectedFacility.Id, currentUser?.Id);
+            feedback = "Sports facility deleted successfully.";
+            feedbackType = "ok";
+            selectedFacility = null;
+            selectedFacilityId = string.Empty;
+            facilityEditor = new UpdateFacilityRequest { Capacity = 10 };
+            Reload();
+        }
+        catch (Exception ex)
+        {
+            feedback = ex.Message;
+            feedbackType = "error";
+        }
+    }
+
+    private void Reload()
+    {
+        facilities = Hub.GetFacilities(currentUser?.Id).ToList();
+        bookings = Hub.GetBookings(currentUser?.Id).Take(16).ToList();
+    }
+}

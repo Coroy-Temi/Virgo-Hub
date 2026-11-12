@@ -1,0 +1,454 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:VirgoHub.Mobile.Controls"
+             x:Class="VirgoHub.Mobile.HomePage"
+             Title="VirgoHub"
+             NavigationPage.HasNavigationBar="False"
+             BackgroundColor="{AppThemeBinding Light=#F5FAFF, Dark=#07172C}">
+    <Grid RowDefinitions="*,Auto">
+        <ScrollView Grid.Row="0">
+            <VerticalStackLayout Padding="18,18,18,20" Spacing="16">
+                <Grid ColumnDefinitions="Auto,*,Auto"
+                      ColumnSpacing="14">
+                    <Border Grid.Column="0"
+                            WidthRequest="60"
+                            HeightRequest="60"
+                            BackgroundColor="{AppThemeBinding Light=#DFF1FF, Dark=#14335D}"
+                            StrokeThickness="0">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="30" />
+                        </Border.StrokeShape>
+                        <Label Text="{Binding AvatarInitial}"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"
+                               FontSize="22"
+                               FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light=#0F4BA8, Dark=White}" />
+                    </Border>
+
+                    <VerticalStackLayout Grid.Column="1"
+                                         VerticalOptions="Center"
+                                         Spacing="2">
+                        <Label Text="{Binding GreetingTitle}"
+                               FontSize="22"
+                               FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light=#0B213F, Dark=White}" />
+                        <Label Text="{Binding StudentReference}"
+                               FontSize="14"
+                               FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light=#2EA6E8, Dark=#8ED4FF}" />
+                    </VerticalStackLayout>
+
+                    <Border Grid.Column="2"
+                            WidthRequest="52"
+                            HeightRequest="52"
+                            Padding="0"
+                            BackgroundColor="{AppThemeBinding Light=#74C8FF, Dark=#14335D}"
+                            StrokeThickness="0">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="26" />
+                        </Border.StrokeShape>
+                        <ImageButton Source="icon_profile.svg"
+                                     BackgroundColor="Transparent"
+                                     HeightRequest="24"
+                                     WidthRequest="24"
+                                     HorizontalOptions="Center"
+                                     VerticalOptions="Center"
+                                     Clicked="OnNotificationsClicked" />
+                    </Border>
+                </Grid>
+
+                <Border Padding="16,10"
+                        BackgroundColor="{AppThemeBinding Light=White, Dark=#102542}"
+                        Stroke="{AppThemeBinding Light=#E0EDF9, Dark=#1C3E71}"
+                        StrokeThickness="1">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="22" />
+                    </Border.StrokeShape>
+                    <Grid ColumnDefinitions="Auto,*"
+                          ColumnSpacing="12">
+                        <Label Grid.Column="0"
+                               Text="&#x1F50D;"
+                               FontSize="24"
+                               VerticalTextAlignment="Center" />
+                        <SearchBar Grid.Column="1"
+                                   Text="{Binding SearchQuery}"
+                                   Placeholder="Search activities, events, courses..."
+                                   BackgroundColor="Transparent"
+                                   CancelButtonColor="#98A8B8"
+                                   HeightRequest="44" />
+                    </Grid>
+                </Border>
+
+                <Border IsVisible="{Binding HasSearchResults}"
+                        Padding="16"
+                        BackgroundColor="{AppThemeBinding Light=White, Dark=#102542}"
+                        Stroke="{AppThemeBinding Light=#E0EDF9, Dark=#1C3E71}"
+                        StrokeThickness="1">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="22" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="{Binding SearchSummary}"
+                               FontSize="14"
+                               FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light=#0B213F, Dark=White}" />
+                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding SearchResults}"
+                                             Spacing="8">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid ColumnDefinitions="Auto,*"
+                                          ColumnSpacing="10">
+                                        <Border WidthRequest="34"
+                                                HeightRequest="34"
+                                                BackgroundColor="{AppThemeBinding Light=#EAF5FF, Dark=#17355F}"
+                                                StrokeThickness="0">
+                                            <Border.StrokeShape>
+                                                <RoundRectangle CornerRadius="17" />
+                                            </Border.StrokeShape>
+                                            <Label Text="*"
+                                                   HorizontalOptions="Center"
+                                                   VerticalOptions="Center"
+                                                   FontSize="22"
+                                                   TextColor="{AppThemeBinding Light=#2EA6E8, Dark=#8ED4FF}" />
+                                        </Border>
+                                        <VerticalStackLayout Grid.Column="1"
+                                                             Spacing="1">
+                                            <Label Text="{Binding Title}"
+                                                   FontAttributes="Bold"
+                                                   TextColor="{AppThemeBinding Light=#0B213F, Dark=White}" />
+                                            <Label Text="{Binding Subtitle}"
+                                                   FontSize="12"
+                                                   TextColor="{AppThemeBinding Light=#6D7F92, Dark=#BED3EA}" />
+                                        </VerticalStackLayout>
+                                        <Grid.GestureRecognizers>
+                                            <TapGestureRecognizer Tapped="OnSearchResultTapped" />
+                                        </Grid.GestureRecognizers>
+                                    </Grid>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+
+                <VerticalStackLayout Spacing="12">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Grid.Column="0"
+                               Text="Upcoming Chapel Event"
+                               FontSize="18"
+                               FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light=#0B213F, Dark=White}" />
+                        <Button Grid.Column="1"
+                                Text="View All"
+                                FontSize="13"
+                                FontAttributes="Bold"
+                                TextColor="#2EA6E8"
+                                BackgroundColor="Transparent"
+                                Padding="0"
+                                Clicked="OnEventsViewAllClicked" />
+                    </Grid>
+
+                    <Border Padding="16"
+                            BackgroundColor="{AppThemeBinding Light=White, Dark=#102542}"
+                            Stroke="{AppThemeBinding Light=#E0EDF9, Dark=#1C3E71}"
+                            StrokeThickness="1">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="24" />
+                        </Border.StrokeShape>
+                        <Grid ColumnDefinitions="Auto,*"
+                              ColumnSpacing="12">
+                            <Border Grid.Column="0"
+                                    WidthRequest="44"
+                                    HeightRequest="44"
+                                    BackgroundColor="{AppThemeBinding Light=#EAF5FF, Dark=#17355F}"
+                                    StrokeThickness="0">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="16" />
+                                </Border.StrokeShape>
+                                <Image Source="icon_events.svg"
+                                       HeightRequest="24"
+                                       WidthRequest="24"
+                                       HorizontalOptions="Center"
+                                       VerticalOptions="Center" />
+                            </Border>
+                            <VerticalStackLayout Grid.Column="1"
+                                                 Spacing="4">
+                                <Label Text="{Binding FeaturedChapelTitle}"
+                                       FontSize="16"
+                                       FontAttributes="Bold"
+                                       TextColor="{AppThemeBinding Light=#32404D, Dark=White}" />
+                                <Label Text="{Binding FeaturedChapelSubtitle}"
+                                       FontSize="13"
+                                       TextColor="{AppThemeBinding Light=#637789, Dark=#BED3EA}"
+                                       LineBreakMode="WordWrap" />
+                            </VerticalStackLayout>
+                        </Grid>
+                    </Border>
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="Dashboard"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           TextColor="{AppThemeBinding Light=#0B213F, Dark=White}" />
+
+                    <Grid ColumnDefinitions="*,*"
+                          RowDefinitions="Auto,Auto"
+                          ColumnSpacing="14"
+                          RowSpacing="14">
+                        <Border Grid.Row="0"
+                                Grid.Column="0"
+                                Padding="18"
+                                BackgroundColor="{AppThemeBinding Light=White, Dark=#102542}"
+                                Stroke="{AppThemeBinding Light=#E0EDF9, Dark=#1C3E71}"
+                                StrokeThickness="1"
+                                MinimumHeightRequest="162">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="28" />
+                            </Border.StrokeShape>
+                            <Grid Padding="0">
+                                <VerticalStackLayout Spacing="12">
+                                    <Border WidthRequest="48"
+                                            HeightRequest="48"
+                                            BackgroundColor="{AppThemeBinding Light=#E3F5FF, Dark=#17355F}"
+                                            StrokeThickness="0">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="16" />
+                                        </Border.StrokeShape>
+                                        <Image Source="icon_sports.svg"
+                                               HeightRequest="24"
+                                               WidthRequest="24"
+                                               HorizontalOptions="Center"
+                                               VerticalOptions="Center" />
+                                    </Border>
+                                    <VerticalStackLayout Spacing="3">
+                                        <Label Text="Sports"
+                                               FontSize="16"
+                                               FontAttributes="Bold"
+                                               TextColor="{AppThemeBinding Light=#0B213F, Dark=White}" />
+                                        <Label Text="Facility Booking"
+                                               FontSize="12"
+                                               TextColor="{AppThemeBinding Light=#445563, Dark=#BED3EA}" />
+                                    </VerticalStackLayout>
+                                    <Border Padding="12,6"
+                                            HorizontalOptions="Start"
+                                            BackgroundColor="{AppThemeBinding Light=#E3F5FF, Dark=#17355F}"
+                                            StrokeThickness="0">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="14" />
+                                        </Border.StrokeShape>
+                                        <Label Text="{Binding SportsStatus}"
+                                               FontSize="12"
+                                               FontAttributes="Bold"
+                                               TextColor="#3BAEEA" />
+                                    </Border>
+                                </VerticalStackLayout>
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnSportsClicked" />
+                                </Grid.GestureRecognizers>
+                            </Grid>
+                        </Border>
+
+                        <Border Grid.Row="0"
+                                Grid.Column="1"
+                                Padding="18"
+                                BackgroundColor="{AppThemeBinding Light=White, Dark=#102542}"
+                                Stroke="{AppThemeBinding Light=#E0EDF9, Dark=#1C3E71}"
+                                StrokeThickness="1"
+                                MinimumHeightRequest="162">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="28" />
+                            </Border.StrokeShape>
+                            <Grid Padding="0">
+                                <VerticalStackLayout Spacing="12">
+                                    <Border WidthRequest="48"
+                                            HeightRequest="48"
+                                            BackgroundColor="{AppThemeBinding Light=#E9FFF1, Dark=#153C2F}"
+                                            StrokeThickness="0">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="16" />
+                                        </Border.StrokeShape>
+                                        <Image Source="icon_voting.svg"
+                                               HeightRequest="24"
+                                               WidthRequest="24"
+                                               HorizontalOptions="Center"
+                                               VerticalOptions="Center" />
+                                    </Border>
+                                    <VerticalStackLayout Spacing="3">
+                                        <Label Text="E-Voting"
+                                               FontSize="16"
+                                               FontAttributes="Bold"
+                                               TextColor="{AppThemeBinding Light=#0B213F, Dark=White}" />
+                                        <Label Text="Campus Elections"
+                                               FontSize="12"
+                                               TextColor="{AppThemeBinding Light=#445563, Dark=#BED3EA}" />
+                                    </VerticalStackLayout>
+                                    <Border Padding="12,6"
+                                            HorizontalOptions="Start"
+                                            BackgroundColor="{AppThemeBinding Light=#E9FFF1, Dark=#153C2F}"
+                                            StrokeThickness="0">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="14" />
+                                        </Border.StrokeShape>
+                                        <Label Text="{Binding VotingStatus}"
+                                               FontSize="12"
+                                               FontAttributes="Bold"
+                                               TextColor="#4EBB78" />
+                                    </Border>
+                                </VerticalStackLayout>
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnVotingClicked" />
+                                </Grid.GestureRecognizers>
+                            </Grid>
+                        </Border>
+
+                        <Border Grid.Row="1"
+                                Grid.Column="0"
+                                Padding="18"
+                                BackgroundColor="{AppThemeBinding Light=White, Dark=#102542}"
+                                Stroke="{AppThemeBinding Light=#E0EDF9, Dark=#1C3E71}"
+                                StrokeThickness="1"
+                                MinimumHeightRequest="162">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="28" />
+                            </Border.StrokeShape>
+                            <Grid Padding="0">
+                                <VerticalStackLayout Spacing="12">
+                                    <Border WidthRequest="48"
+                                            HeightRequest="48"
+                                            BackgroundColor="{AppThemeBinding Light=#FFF6DE, Dark=#4A3C13}"
+                                            StrokeThickness="0">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="16" />
+                                        </Border.StrokeShape>
+                                        <Image Source="icon_library.svg"
+                                               HeightRequest="24"
+                                               WidthRequest="24"
+                                               HorizontalOptions="Center"
+                                               VerticalOptions="Center" />
+                                    </Border>
+                                    <VerticalStackLayout Spacing="3">
+                                        <Label Text="Materials"
+                                               FontSize="16"
+                                               FontAttributes="Bold"
+                                               TextColor="{AppThemeBinding Light=#0B213F, Dark=White}" />
+                                        <Label Text="Course Materials"
+                                               FontSize="12"
+                                               TextColor="{AppThemeBinding Light=#445563, Dark=#BED3EA}" />
+                                    </VerticalStackLayout>
+                                    <Border Padding="12,6"
+                                            HorizontalOptions="Start"
+                                            BackgroundColor="{AppThemeBinding Light=#FFF6DE, Dark=#4A3C13}"
+                                            StrokeThickness="0">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="14" />
+                                        </Border.StrokeShape>
+                                        <Label Text="{Binding LibraryStatus}"
+                                               FontSize="12"
+                                               FontAttributes="Bold"
+                                               TextColor="#D5A200" />
+                                    </Border>
+                                </VerticalStackLayout>
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnLibraryClicked" />
+                                </Grid.GestureRecognizers>
+                            </Grid>
+                        </Border>
+
+                        <Border Grid.Row="1"
+                                Grid.Column="1"
+                                Padding="18"
+                                BackgroundColor="{AppThemeBinding Light=White, Dark=#102542}"
+                                Stroke="{AppThemeBinding Light=#E0EDF9, Dark=#1C3E71}"
+                                StrokeThickness="1"
+                                MinimumHeightRequest="162">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="28" />
+                            </Border.StrokeShape>
+                            <Grid Padding="0">
+                                <VerticalStackLayout Spacing="12">
+                                    <Border WidthRequest="48"
+                                            HeightRequest="48"
+                                            BackgroundColor="{AppThemeBinding Light=#FFE8F1, Dark=#47223A}"
+                                            StrokeThickness="0">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="16" />
+                                        </Border.StrokeShape>
+                                        <Image Source="icon_complaints.svg"
+                                               HeightRequest="24"
+                                               WidthRequest="24"
+                                               HorizontalOptions="Center"
+                                               VerticalOptions="Center" />
+                                    </Border>
+                                    <VerticalStackLayout Spacing="3">
+                                        <Label Text="Hostel"
+                                               FontSize="16"
+                                               FontAttributes="Bold"
+                                               TextColor="{AppThemeBinding Light=#0B213F, Dark=White}" />
+                                        <Label Text="Report Issues"
+                                               FontSize="12"
+                                               TextColor="{AppThemeBinding Light=#445563, Dark=#BED3EA}" />
+                                    </VerticalStackLayout>
+                                    <Border Padding="12,6"
+                                            HorizontalOptions="Start"
+                                            BackgroundColor="{AppThemeBinding Light=#FFE8F1, Dark=#47223A}"
+                                            StrokeThickness="0">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="14" />
+                                        </Border.StrokeShape>
+                                        <Label Text="{Binding HostelStatus}"
+                                               FontSize="12"
+                                               FontAttributes="Bold"
+                                               TextColor="#E36A97" />
+                                    </Border>
+                                </VerticalStackLayout>
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnComplaintsClicked" />
+                                </Grid.GestureRecognizers>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="Recent Activity"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           TextColor="{AppThemeBinding Light=#0B213F, Dark=White}" />
+
+                    <VerticalStackLayout BindableLayout.ItemsSource="{Binding Store.RecentActivities}"
+                                         Spacing="10">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate>
+                                <Border Padding="14"
+                                        BackgroundColor="{AppThemeBinding Light=White, Dark=#102542}"
+                                        Stroke="{AppThemeBinding Light=#E0EDF9, Dark=#1C3E71}"
+                                        StrokeThickness="1">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="22" />
+                                    </Border.StrokeShape>
+                                    <VerticalStackLayout Spacing="4">
+                                        <Label Text="{Binding Title}"
+                                               FontAttributes="Bold"
+                                               TextColor="{AppThemeBinding Light=#0B213F, Dark=White}" />
+                                        <Label Text="{Binding Description}"
+                                               FontSize="12"
+                                               TextColor="{AppThemeBinding Light=#6D7F92, Dark=#BED3EA}"
+                                               LineBreakMode="WordWrap" />
+                                        <Label Text="{Binding CreatedAt, StringFormat='{}{0:dd MMM, hh:mm tt}'}"
+                                               FontSize="12"
+                                               TextColor="#2EA6E8" />
+                                    </VerticalStackLayout>
+                                </Border>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <controls:PortalBottomNav Grid.Row="1"
+                                  ActiveTab="Home" />
+    </Grid>
+</ContentPage>

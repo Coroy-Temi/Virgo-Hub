@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:VirgoHub.Mobile.Controls"
+             x:Class="VirgoHub.Mobile.NotificationsPage"
+             Title="Notifications"
+             NavigationPage.HasNavigationBar="False"
+             BackgroundColor="{AppThemeBinding Light=#EFF7FF, Dark=#07172C}">
+    <Grid RowDefinitions="*,Auto">
+        <ScrollView Grid.Row="0">
+            <VerticalStackLayout Padding="20,18,20,22" Spacing="18">
+                <Grid ColumnDefinitions="Auto,*"
+                      ColumnSpacing="14">
+                    <Button Text="Back"
+                            Padding="14,8"
+                            CornerRadius="16"
+                            BackgroundColor="{AppThemeBinding Light=#EAF4FF, Dark=#173E71}"
+                            TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}"
+                            Clicked="OnBackClicked" />
+                    <VerticalStackLayout Grid.Column="1" Spacing="4">
+                        <Label Text="{Binding Store.NotificationPageTitle}"
+                               FontSize="28"
+                               FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                        <Label Text="{Binding Store.NotificationPageSummary}"
+                               FontSize="13"
+                               TextColor="{AppThemeBinding Light=#6884A5, Dark=#C8D9F0}" />
+                    </VerticalStackLayout>
+                </Grid>
+
+                <Border Padding="18"
+                        BackgroundColor="{AppThemeBinding Light=White, Dark=#102542}"
+                        Stroke="{AppThemeBinding Light=#DCEEFF, Dark=#1A3B70}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="28" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout Spacing="14">
+                        <Label Text="Push Notifications"
+                               FontSize="22"
+                               FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+
+                        <Border Padding="16"
+                                BackgroundColor="{AppThemeBinding Light=#F7FBFF, Dark=#0B2249}"
+                                StrokeThickness="0">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="22" />
+                            </Border.StrokeShape>
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                                <VerticalStackLayout Spacing="3">
+                                    <Label Text="{Binding Store.ElectionNotificationTitle}" FontAttributes="Bold" TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                                    <Label Text="{Binding Store.ElectionNotificationSummary}" FontSize="13" TextColor="{AppThemeBinding Light=#6884A5, Dark=#C8D9F0}" />
+                                </VerticalStackLayout>
+                                <Switch Grid.Column="1" IsToggled="{Binding Store.ReceiveElectionNotifications}" OnColor="#25A9F5" />
+                            </Grid>
+                        </Border>
+
+                        <Border Padding="16"
+                                BackgroundColor="{AppThemeBinding Light=#F7FBFF, Dark=#0B2249}"
+                                StrokeThickness="0">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="22" />
+                            </Border.StrokeShape>
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                                <VerticalStackLayout Spacing="3">
+                                    <Label Text="{Binding Store.EventNotificationTitle}" FontAttributes="Bold" TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                                    <Label Text="{Binding Store.EventNotificationSummary}" FontSize="13" TextColor="{AppThemeBinding Light=#6884A5, Dark=#C8D9F0}" />
+                                </VerticalStackLayout>
+                                <Switch Grid.Column="1" IsToggled="{Binding Store.ReceiveEventNotifications}" OnColor="#25A9F5" />
+                            </Grid>
+                        </Border>
+
+                        <Border Padding="16"
+                                BackgroundColor="{AppThemeBinding Light=#F7FBFF, Dark=#0B2249}"
+                                StrokeThickness="0">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="22" />
+                            </Border.StrokeShape>
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                                <VerticalStackLayout Spacing="3">
+                                    <Label Text="{Binding Store.ComplaintNotificationTitle}" FontAttributes="Bold" TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                                    <Label Text="{Binding Store.ComplaintNotificationSummary}" FontSize="13" TextColor="{AppThemeBinding Light=#6884A5, Dark=#C8D9F0}" />
+                                </VerticalStackLayout>
+                                <Switch Grid.Column="1" IsToggled="{Binding Store.ReceiveComplaintNotifications}" OnColor="#25A9F5" />
+                            </Grid>
+                        </Border>
+
+                        <Border Padding="16"
+                                BackgroundColor="{AppThemeBinding Light=#F7FBFF, Dark=#0B2249}"
+                                StrokeThickness="0">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="22" />
+                            </Border.StrokeShape>
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                                <VerticalStackLayout Spacing="3">
+                                    <Label Text="{Binding Store.NewsNotificationTitle}" FontAttributes="Bold" TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                                    <Label Text="{Binding Store.NewsNotificationSummary}" FontSize="13" TextColor="{AppThemeBinding Light=#6884A5, Dark=#C8D9F0}" />
+                                </VerticalStackLayout>
+                                <Switch Grid.Column="1" IsToggled="{Binding Store.ReceiveNewsNotifications}" OnColor="#25A9F5" />
+                            </Grid>
+                        </Border>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Padding="18"
+                        BackgroundColor="{AppThemeBinding Light=White, Dark=#102542}"
+                        Stroke="{AppThemeBinding Light=#DCEEFF, Dark=#1A3B70}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="24" />
+                    </Border.StrokeShape>
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="Notification Activity"
+                                   FontSize="20"
+                                   FontAttributes="Bold"
+                                   TextColor="{AppThemeBinding Light=#0B2A56, Dark=White}" />
+                            <Label Text="{Binding ActivitySummary}"
+                                   FontSize="13"
+                                   TextColor="{AppThemeBinding Light=#6884A5, Dark=#C8D9F0}" />
+                        </VerticalStackLayout>
+                        <Button Grid.Column="1"
+                                Text="Open"
+                                BackgroundColor="#DCEEFF"
+                                TextColor="#0B2A56"
+                                Clicked="OnOpenActivityClicked" />
+                    </Grid>
+                </Border>
+
+                <Button Text="Save Preferences"
+                        CornerRadius="24"
+                        HeightRequest="58"
+                        BackgroundColor="#25A9F5"
+                        FontAttributes="Bold"
+                        TextColor="White"
+                        Clicked="OnSavePreferencesClicked" />
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <controls:PortalBottomNav Grid.Row="1"
+                                  ActiveTab="Profile" />
+    </Grid>
+</ContentPage>

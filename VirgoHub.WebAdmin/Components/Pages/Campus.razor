@@ -1,0 +1,290 @@
+@page "/events"
+@attribute [Authorize(Roles = "SuperAdmin,Admin")]
+@inject VirgoHubService Hub
+
+<PageTitle>VirgoHub Events</PageTitle>
+
+@if (!hasAccess)
+{
+    <section class="surface-card">
+        <div class="empty-state-vgh">
+            <strong>Access restricted</strong>
+            <span>Your portal account does not have permission to manage events.</span>
+        </div>
+    </section>
+}
+else
+{
+<section class="page-intro">
+    <div>
+        <div class="section-kicker">Events and Chapel</div>
+        <h2>Publish, edit, and remove school updates.</h2>
+        <p>Manage chapel notices, campus events, and scheduled updates from one desk.</p>
+    </div>
+</section>
+
+@if (!string.IsNullOrWhiteSpace(feedback))
+{
+    <div class="toast-banner @feedbackType">@feedback</div>
+}
+
+<section class="dashboard-grid">
+    <div class="surface-card">
+        <div class="surface-head">
+            <h3>Publish event</h3>
+        </div>
+        <div class="form-grid-vgh">
+            <label><span>Title</span><InputText @bind-Value="eventTitle" /></label>
+            <label><span>Category</span><InputText @bind-Value="eventCategory" /></label>
+            <label><span>Venue</span><InputText @bind-Value="eventVenue" /></label>
+            <label><span>Faculty</span><InputText @bind-Value="eventAudienceFaculty" /></label>
+            <label class="full-span"><span>Departments</span><InputTextArea @bind-Value="eventAudienceDepartmentsText" placeholder="Leave blank for the whole faculty, or enter one or more departments separated by commas." /></label>
+            <label><span>Date</span><InputDate @bind-Value="eventStartsOn" /></label>
+            <label class="full-span"><span>Description</span><InputTextArea @bind-Value="eventDescription" /></label>
+        </div>
+        <button class="vgh-button" @onclick="CreateEventAsync">Publish event</button>
+    </div>
+
+    <div class="surface-card">
+        <div class="surface-head">
+            <h3>Edit event</h3>
+        </div>
+        <div class="form-grid-vgh">
+            <label class="full-span">
+                <span>Select event</span>
+                <InputSelect @bind-Value="selectedEventId">
+                    <option value="">Choose an event</option>
+                    @foreach (var item in events)
+                    {
+                        <option value="@item.Id">@item.Title - @item.StartsAt.LocalDateTime.ToString("dd MMM yyyy")</option>
+                    }
+                </InputSelect>
+            </label>
+        </div>
+        <div style="margin-top: 0.9rem; display: flex; gap: 0.75rem; flex-wrap: wrap;">
+            <button class="vgh-button alt" @onclick="LoadEventEditor">Load event</button>
+            @if (selectedEvent is not null)
+            {
+                <button class="vgh-button" @onclick="UpdateEventAsync">Save changes</button>
+                <button class="vgh-button alt" @onclick="DeleteEventAsync">Delete event</button>
+            }
+        </div>
+
+        @if (selectedEvent is not null)
+        {
+            <div class="form-grid-vgh" style="margin-top: 1rem;">
+                <label><span>Title</span><InputText @bind-Value="eventEditor.Title" /></label>
+                <label><span>Category</span><InputText @bind-Value="eventEditor.Category" /></label>
+                <label><span>Venue</span><InputText @bind-Value="eventEditor.Venue" /></label>
+                <label><span>Faculty</span><InputText @bind-Value="eventEditor.AudienceFaculty" /></label>
+                <label class="full-span"><span>Departments</span><InputTextArea @bind-Value="eventEditorDepartmentsText" placeholder="Leave blank for the whole faculty, or enter one or more departments separated by commas." /></label>
+                <label><span>Date</span><InputDate @bind-Value="eventEditDate" /></label>
+                <label class="full-span"><span>Description</span><InputTextArea @bind-Value="eventEditor.Description" /></label>
+            </div>
+        }
+    </div>
+</section>
+
+<section class="surface-card">
+    <div class="surface-head">
+        <h3>Upcoming calendar</h3>
+        <span>@events.Count entries</span>
+    </div>
+    <div class="table-shell">
+        <table>
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Category</th>
+                    <th>Audience</th>
+                    <th>Venue</th>
+                    <th>Starts</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in events)
+                {
+                    <tr>
+                        <td>@item.Title</td>
+                        <td>@item.Category</td>
+                        <td>@FormatAudience(item.AudienceFaculty, item.AudienceDepartments)</td>
+                        <td>@item.Venue</td>
+                        <td>@item.StartsAt.LocalDateTime.ToString("dd MMM yyyy, hh:mm tt")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</section>
+}
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthenticationStateTask { get; set; }
+
+    private List<CampusEvent> events = [];
+    private UserProfile? currentUser;
+    private CampusEvent? selectedEvent;
+    private UpdateEventRequest eventEditor = new();
+    private string selectedEventId = string.Empty;
+    private string feedback = string.Empty;
+    private string feedbackType = "ok";
+    private string eventTitle = string.Empty;
+    private string eventCategory = "Event";
+    private string eventVenue = string.Empty;
+    private string eventDescription = string.Empty;
+    private string eventAudienceFaculty = string.Empty;
+    private string eventAudienceDepartmentsText = string.Empty;
+    private string eventEditorDepartmentsText = string.Empty;
+    private DateTime eventStartsOn = DateTime.Today.AddDays(1);
+    private DateTime eventEditDate = DateTime.Today.AddDays(1);
+    private bool hasAccess;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (AuthenticationStateTask is null)
+        {
+            return;
+        }
+
+        var authState = await AuthenticationStateTask;
+        var userId = authState.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        currentUser = string.IsNullOrWhiteSpace(userId) ? null : Hub.GetUserById(userId);
+        hasAccess = currentUser is not null && (currentUser.Role == UserRole.SuperAdmin || Hub.CanAccessModule(currentUser.Id, AdminModule.Events));
+
+        if (hasAccess)
+        {
+            Reload();
+        }
+    }
+
+    private async Task CreateEventAsync()
+    {
+        try
+        {
+            await Hub.CreateEventAsync(new CreateEventRequest
+            {
+                Title = eventTitle,
+                Category = eventCategory,
+                Venue = eventVenue,
+                AudienceFaculty = eventAudienceFaculty,
+                AudienceDepartments = ParseDepartments(eventAudienceDepartmentsText),
+                Description = eventDescription,
+                StartsAt = new DateTimeOffset(eventStartsOn.Year, eventStartsOn.Month, eventStartsOn.Day, 14, 0, 0, TimeSpan.Zero),
+                CreatedBy = currentUser?.FullName ?? Hub.GetSuperAdmin(currentUser?.TenantId)?.FullName ?? "Super Admin"
+            }, currentUser?.Id);
+
+            feedback = "The event has been published.";
+            feedbackType = "ok";
+            eventTitle = string.Empty;
+            eventCategory = "Event";
+            eventVenue = string.Empty;
+            eventDescription = string.Empty;
+            eventAudienceFaculty = string.Empty;
+            eventAudienceDepartmentsText = string.Empty;
+            eventStartsOn = DateTime.Today.AddDays(1);
+            Reload();
+        }
+        catch (Exception ex)
+        {
+            feedback = ex.Message;
+            feedbackType = "error";
+        }
+    }
+
+    private void LoadEventEditor()
+    {
+        selectedEvent = events.FirstOrDefault(x => x.Id == selectedEventId);
+        if (selectedEvent is null)
+        {
+            feedback = "Select an event first.";
+            feedbackType = "error";
+            return;
+        }
+
+        eventEditor = new UpdateEventRequest
+        {
+            Title = selectedEvent.Title,
+            Category = selectedEvent.Category,
+            Venue = selectedEvent.Venue,
+            AudienceFaculty = selectedEvent.AudienceFaculty,
+            AudienceDepartments = selectedEvent.AudienceDepartments.ToList(),
+            Description = selectedEvent.Description,
+            StartsAt = selectedEvent.StartsAt
+        };
+        eventEditorDepartmentsText = string.Join(", ", selectedEvent.AudienceDepartments);
+        eventEditDate = selectedEvent.StartsAt.LocalDateTime.Date;
+    }
+
+    private async Task UpdateEventAsync()
+    {
+        try
+        {
+            if (selectedEvent is null)
+            {
+                throw new InvalidOperationException("Load an event first.");
+            }
+
+            eventEditor.StartsAt = new DateTimeOffset(eventEditDate.Year, eventEditDate.Month, eventEditDate.Day, 14, 0, 0, TimeSpan.Zero);
+            eventEditor.AudienceDepartments = ParseDepartments(eventEditorDepartmentsText);
+            await Hub.UpdateEventAsync(selectedEvent.Id, eventEditor, currentUser?.Id);
+            feedback = "The event has been updated.";
+            feedbackType = "ok";
+            Reload();
+            LoadEventEditor();
+        }
+        catch (Exception ex)
+        {
+            feedback = ex.Message;
+            feedbackType = "error";
+        }
+    }
+
+    private async Task DeleteEventAsync()
+    {
+        try
+        {
+            if (selectedEvent is null)
+            {
+                throw new InvalidOperationException("Load an event first.");
+            }
+
+            await Hub.DeleteEventAsync(selectedEvent.Id, currentUser?.Id);
+            feedback = "The event has been deleted.";
+            feedbackType = "ok";
+            selectedEvent = null;
+            selectedEventId = string.Empty;
+            eventEditor = new UpdateEventRequest();
+            eventEditorDepartmentsText = string.Empty;
+            Reload();
+        }
+        catch (Exception ex)
+        {
+            feedback = ex.Message;
+            feedbackType = "error";
+        }
+    }
+
+    private void Reload() => events = Hub.GetEvents(currentUser?.Id).ToList();
+
+    private static List<string> ParseDepartments(string? raw) =>
+        (raw ?? string.Empty)
+            .Split([',', '\n', '\r'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+    private static string FormatAudience(string? faculty, IEnumerable<string>? departments)
+    {
+        var facultyLabel = faculty?.Trim();
+        var departmentList = ParseDepartments(string.Join(",", departments ?? Array.Empty<string>()));
+
+        if (string.IsNullOrWhiteSpace(facultyLabel))
+        {
+            return "Campus-wide";
+        }
+
+        return departmentList.Count == 0
+            ? $"{facultyLabel} faculty"
+            : $"{facultyLabel}: {string.Join(", ", departmentList)}";
+    }
+}
